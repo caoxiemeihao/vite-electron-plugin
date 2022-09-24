@@ -1,5 +1,4 @@
 import fs from 'fs'
-import path from 'path'
 import { spawn } from 'child_process'
 import type { ViteDevServer } from 'vite'
 import {
@@ -12,11 +11,10 @@ import { build } from './build'
 export async function bootstrap(config: ResolvedConfig, server: ViteDevServer) {
   process.env.VITE_DEV_SERVER_URL = resolveEnv(server)!.url
 
-  const { watcher, include2files, src2dist } = config
-  await build(config, include2files)
-  const isAutoStart = startupHandle(config, server, '', '') !== false
-
-  watcher.on('all', async (event, filepath) => {
+  const { watcher, src2dist } = config
+  const startup = debounce(startupHandle)
+  // There can't be any await statement here, it will cause `watcher.on` to miss the first trigger.
+  watcher?.on('all', async (event, filepath) => {
     const fp = src2dist(filepath)
 
     switch (event) {
@@ -35,9 +33,7 @@ export async function bootstrap(config: ResolvedConfig, server: ViteDevServer) {
         break
     }
 
-    if (isAutoStart && extensions.includes(path.extname(filepath))) {
-      startupHandle(config, server, event, filepath)
-    }
+    startup(config, server, event, filepath)
   })
 }
 
@@ -90,9 +86,10 @@ function ispreload(fielname: string) {
   return extensions.some(ext => fielname.endsWith('preload' + ext))
 }
 
-function debounce(fn: (...args: any[]) => void, delay = 400) {
+function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
   let t: NodeJS.Timeout
-  return (...args: any[]) => {
+  return (...args: Parameters<Fn>) => {
+    // !t && fn(...args) // first call
     clearTimeout(t)
     t = setTimeout(() => fn(...args), delay)
   }

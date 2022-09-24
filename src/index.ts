@@ -25,10 +25,7 @@ function electron(config: Configuration): Plugin[] {
       name: `${name}:serve`,
       apply: 'serve',
       configureServer(server) {
-        const resolved = resolveConfig(config, 'serve')
-        server.httpServer!.on('listening', () => {
-          bootstrap(resolved, server)
-        })
+        server.httpServer!.on('listening', () => bootstrap(resolveConfig(config, 'serve'), server))
       },
     },
     {

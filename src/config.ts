@@ -28,7 +28,7 @@ export interface Configuration {
     viteDevServer: import('vite').ViteDevServer
   }) => void
   /** Options of `esbuild.transform()` */
-  transform?: import('esbuild').TransformOptions
+  transformOptions?: import('esbuild').TransformOptions
 }
 
 export interface ResolvedConfig {
@@ -37,45 +37,53 @@ export interface ResolvedConfig {
   /** Relative path */
   include: string[]
   outDir: string
-  transform: TransformOptions
+  transformOptions: TransformOptions
   watcher: FSWatcher | null
   include2files: string[]
   src2dist: (filename: string) => string
 }
 
 export function resolveConfig(config: Configuration, command: 'build' | 'serve'): ResolvedConfig {
+  const {
+    root,
+    include,
+    outDir,
+    transformOptions,
+  } = config
   // https://github.com/vitejs/vite/blob/9a83eaffac3383f5ee68097807de532f0b5cb25c/packages/vite/src/node/config.ts#L456-L459
   // resolve root
   const resolvedRoot = normalizePath(
-    config.root ? path.resolve(config.root) : process.cwd()
+    root ? path.resolve(root) : process.cwd()
   )
-  const outDir = normalizePath(config.outDir ?? 'dist-electron')
+  const defaultOutDir = normalizePath(outDir ?? 'dist-electron')
 
   const resolved: ResolvedConfig = {
     config,
     root: resolvedRoot,
-    include: config.include.map(p => path.isAbsolute(p)
+    include: include.map(p => path.isAbsolute(p)
       ? p.replace(resolvedRoot + '/', '')
       : p),
-    outDir: path.isAbsolute(outDir)
-      ? outDir
-      : path.posix.join(resolvedRoot, outDir),
-    transform: Object.assign({
+    outDir: path.isAbsolute(defaultOutDir)
+      ? defaultOutDir
+      : path.posix.join(resolvedRoot, defaultOutDir),
+    transformOptions: Object.assign({
       target: 'node14',
       // At present, Electron(20) can only support CommonJs
       format: 'cjs',
-    }, config.transform),
+    }, transformOptions),
     watcher: null,
-    include2files: null as any,
-    src2dist: null as any,
-  }
-
-  if (command === 'serve') {
-    resolved.watcher = watch(/* 🚨 Any file */include2globs(resolved))
+    // @ts-ignore
+    include2files: null,
+    // @ts-ignore
+    src2dist: null,
   }
 
   resolved.include2files = include2files(resolved)
   resolved.src2dist = (filename: string) => src2dist(resolved, filename)
+
+  if (command === 'serve') {
+    resolved.watcher = watch(/* 🚨 Any file */include2globs(resolved))
+  }
 
   return resolved
 }

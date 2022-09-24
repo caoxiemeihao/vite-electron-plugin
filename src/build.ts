@@ -7,7 +7,7 @@ import {
 } from './config'
 
 export async function build(config: ResolvedConfig, files: string | string[]) {
-  const { src2dist, transform: transformOptions } = config
+  const { src2dist, transformOptions } = config
 
   for (const filename of [files].flat()) {
     const distname = src2dist(filename)
