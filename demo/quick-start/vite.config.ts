@@ -11,6 +11,14 @@ export default defineConfig({
       'electron',
       // 'common.ts',
     ],
+    /*
+    configResolved(config) { },
+    onstart(args) {
+      args.startup()
+    },
+    onwatch(event, path) { },
+    transform(args) { },
+    */
   })],
   clearScreen: false,
 })
