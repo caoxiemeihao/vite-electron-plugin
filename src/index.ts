@@ -24,8 +24,8 @@ function electron(config: Configuration): Plugin[] {
     {
       name: `${name}:serve`,
       apply: 'serve',
-      configureServer(server) {
-        server.httpServer!.on('listening', () => bootstrap(resolveConfig(config, 'serve'), server))
+      async configureServer(server) {
+        server.httpServer!.on('listening', () => bootstrap(config, server))
       },
     },
     {
@@ -35,7 +35,7 @@ function electron(config: Configuration): Plugin[] {
         electronConfigPreset(_config)
       },
       async closeBundle() {
-        const resolved = resolveConfig(config, 'build')
+        const resolved = await resolveConfig(config, 'build')
         const { include2files } = resolved
         await build(resolved, include2files)
       },

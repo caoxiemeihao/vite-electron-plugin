@@ -5,48 +5,56 @@ import {
   type Configuration,
   type ResolvedConfig,
   extensions,
+  resolveConfig,
 } from './config'
 import { build } from './build'
 
-export async function bootstrap(config: ResolvedConfig, server: ViteDevServer) {
+export async function bootstrap(config: Configuration, server: ViteDevServer) {
   process.env.VITE_DEV_SERVER_URL = resolveEnv(server)!.url
 
-  const { watcher, src2dist } = config
+  const resolved = await resolveConfig(config, 'serve')
+  const { watcher, src2dist, config: rawConfig } = resolved
   const startup = debounce(startupHandle)
   // There can't be any await statement here, it will cause `watcher.on` to miss the first trigger.
-  watcher?.on('all', async (event, filepath) => {
-    const fp = src2dist(filepath)
+  watcher!.on('all', async (event, filepath) => {
+    rawConfig.onwatch?.(event, filepath)
 
+    const distpath = src2dist(filepath)
     switch (event) {
       case 'add':
       case 'change':
-        await build(config, filepath)
+        await build(resolved, filepath)
         break
       case 'addDir':
-        !fs.existsSync(fp) && fs.mkdirSync(fp, { recursive: true })
+        !fs.existsSync(distpath) && fs.mkdirSync(distpath, { recursive: true })
         break
       case 'unlink':
-        fs.existsSync(fp) && fs.unlinkSync(fp)
+        fs.existsSync(distpath) && fs.unlinkSync(distpath)
         break
       case 'unlinkDir':
-        fs.existsSync(fp) && fs.rmSync(fp, { recursive: true, force: true })
+        fs.existsSync(distpath) && fs.rmSync(distpath, { recursive: true, force: true })
         break
     }
 
-    startup(config, server, event, filepath)
+    startup(resolved, server, event, filepath)
   })
+
+  // first start
+  // watcher!.emit('add', 'add', config.include2files[0])
 }
 
 function startupHandle(
   config: ResolvedConfig,
   server: ViteDevServer,
   event: Parameters<Required<Configuration>['onstart']>[0]['event'],
-  fielname: string,
+  filename: string,
 ) {
-  if (config.config.onstart) {
+  const { config: rawConfig } = config
+
+  if (rawConfig.onstart) {
     // Custom Electron App startup
-    config.config.onstart({
-      fielname,
+    rawConfig.onstart({
+      filename,
       event,
       startup,
       viteDevServer: server,
@@ -54,7 +62,7 @@ function startupHandle(
     return false
   }
 
-  if (ispreload(fielname)) {
+  if (ispreload(filename)) {
     server.ws.send({ type: 'full-reload' })
   } else {
     startup()

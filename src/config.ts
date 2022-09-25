@@ -12,43 +12,58 @@ export interface Configuration {
   include: string[]
   /** @default 'dist-electron' */
   outDir?: string
-  /** Triggered by `include` file changes */
+  /** Options of `esbuild.transform()` */
+  transformOptions?: import('esbuild').TransformOptions
+
+  configResolved?: (config: Readonly<ResolvedConfig>) => void | Promise<void>
+  /** Triggered by `include` file changes. You can emit some files in this hooks. */
+  onwatch?: (envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void
+  /** Triggered by changes in .ts, .js, .json files in include */
+  transform?: (args: {
+    /** .ts, .js, .json */
+    filename: string
+    code: string
+    /** Stop subsequent build steps */
+    stop: () => void
+  }) => string | void | Promise<string | void>
+  /** Custom Electron App startup */
   onstart?: (args: {
-    /** The file taht Triggered the onstart */
-    fielname: '' // first start
-    | string
-    event: '' // first start
-    | 'add'
-    | 'change'
-    | 'addDir'
-    | 'unlink'
-    | 'unlinkDir'
+    filename: | string
+    event: Parameters<Required<Configuration>['onwatch']>[0]
     /** Electron App startup function */
     startup: () => Promise<void>
     viteDevServer: import('vite').ViteDevServer
   }) => void
-  /** Options of `esbuild.transform()` */
-  transformOptions?: import('esbuild').TransformOptions
 }
 
 export interface ResolvedConfig {
   config: Configuration
+  /** @default process.cwd() */
   root: string
   /** Relative path */
   include: string[]
+  /** Absolute path */
   outDir: string
+  /** Options of `esbuild.transform()` */
   transformOptions: TransformOptions
+  /** The value is `null` at build time */
   watcher: FSWatcher | null
+  /** From `config.include` */
   include2files: string[]
+  /** src/foo.js -> dist/foo.js */
   src2dist: (filename: string) => string
 }
 
-export function resolveConfig(config: Configuration, command: 'build' | 'serve'): ResolvedConfig {
+export async function resolveConfig(config: Configuration, command: 'build' | 'serve'): Promise<ResolvedConfig> {
+  // Vite hot reload vite.config.js
+  process._resolved_config?.watcher?.close()
+
   const {
     root,
     include,
     outDir,
     transformOptions,
+    configResolved,
   } = config
   // https://github.com/vitejs/vite/blob/9a83eaffac3383f5ee68097807de532f0b5cb25c/packages/vite/src/node/config.ts#L456-L459
   // resolve root
@@ -85,18 +100,23 @@ export function resolveConfig(config: Configuration, command: 'build' | 'serve')
     resolved.watcher = watch(/* 🚨 Any file */include2globs(resolved))
   }
 
-  return resolved
+  // call configResolved hooks
+  await configResolved?.(resolved)
+
+  return process._resolved_config = resolved
 }
 
-export const extensions = ['.ts', '.js']
+export const extensions = ['.ts', '.js', '.json']
 
 /**
  * @see https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
  * @see https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
  */
 export const colours = {
-  cyan: '\x1b[36m%s\x1b[0m',
-  yellow: '\x1b[33m%s\x1b[0m',
+  $_$: (c: number) => (str: string) => `\x1b[${c}m` + str + '\x1b[0m',
+  cyan: (str: string) => colours.$_$(36)(str),
+  yellow: (str: string) => colours.$_$(33)(str),
+  red: (str: string) => colours.$_$(31)(str),
 }
 
 // ----------------------------------------------------------------------

@@ -7,31 +7,60 @@ import {
 } from './config'
 
 export async function build(config: ResolvedConfig, files: string | string[]) {
-  const { src2dist, transformOptions } = config
+  const { src2dist, transformOptions, config: rawConfig } = config
 
   for (const filename of [files].flat()) {
     const distname = src2dist(filename)
-    const distpath = path.dirname(distname)
-    const code = fs.readFileSync(filename, 'utf8')
+    if (distname === filename) {
+      console.log(
+        colours.yellow('Input and output are the same file\n '),
+        filename, '->', distname,
+      )
+      return
+    }
 
-    const result = await transform(code, {
-      loader: path.extname(filename).slice(1) as Loader,
-      ...transformOptions,
+    const distpath = path.dirname(distname)
+    let code = fs.readFileSync(filename, 'utf8')
+    let stop = false
+
+    const transformed = await rawConfig.transform?.({
+      filename,
+      code,
+      stop() {
+        stop = true
+      },
     })
+
+    if (typeof transformed === 'string') {
+      code = transformed
+    }
+
+    if (!stop) {
+      switch (path.extname(filename)) {
+        case '.ts':
+        case '.js':
+          try {
+            const result = await transform(code, {
+              loader: path.extname(filename).slice(1) as Loader,
+              ...transformOptions,
+            })
+            if (result.warnings.length) {
+              console.log(colours.yellow(result.warnings.map(e => e.text).join('\n')))
+            }
+
+            code = result.code
+          } catch (error) {
+            console.log(colours.red(error as string))
+          }
+          break
+      }
+    }
 
     if (!fs.existsSync(distpath)) {
       fs.mkdirSync(distpath, { recursive: true })
     }
 
-    if (distname === filename) {
-      console.log(
-        colours.yellow,
-        'Input and output are the same file\n ',
-        filename, '->', distname
-      )
-    } else {
-      fs.writeFileSync(distname, result.code)
-      console.log(colours.cyan, `[${new Date().toLocaleTimeString()}]`, distname)
-    }
+    fs.writeFileSync(distname, code)
+    console.log(colours.cyan(`[${new Date().toLocaleTimeString()}]`), distname)
   }
 }
