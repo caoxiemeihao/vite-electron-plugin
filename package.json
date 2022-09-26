@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-electron-unbuild",
+  "name": "vite-electron-plugin",
   "version": "0.1.0",
   "description": "Fast, Electron plugin for Vite",
   "main": "index.mjs",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/caoxiemeihao/vite-plugin-electron-unbuild.git"
+    "url": "git+https://github.com/caoxiemeihao/vite-electron-plugin.git"
   },
   "author": "草鞋没号 <308487730@qq.com>",
   "license": "MIT",
