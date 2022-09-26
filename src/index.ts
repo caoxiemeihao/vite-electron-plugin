@@ -3,12 +3,14 @@ import { bootstrap } from './serve'
 import { build } from './build'
 import {
   type Configuration,
+  type ResolvedConfig,
   resolveConfig,
 } from './config'
 
 // public export
 export {
   type Configuration,
+  type ResolvedConfig,
   defineConfig,
   electron as default,
 }

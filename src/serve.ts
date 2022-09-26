@@ -1,10 +1,7 @@
 import fs from 'fs'
-import { spawn } from 'child_process'
 import type { ViteDevServer } from 'vite'
 import {
   type Configuration,
-  type ResolvedConfig,
-  extensions,
   resolveConfig,
 } from './config'
 import { build } from './build'
@@ -12,9 +9,21 @@ import { build } from './build'
 export async function bootstrap(config: Configuration, server: ViteDevServer) {
   process.env.VITE_DEV_SERVER_URL = resolveEnv(server)!.url
 
-  const resolved = await resolveConfig(config, 'serve')
-  const { watcher, src2dist, config: rawConfig } = resolved
-  const startup = debounce(startupHandle)
+  const resolved = await resolveConfig(config, 'serve', server)
+  const {
+    watcher,
+    src2dist,
+    config: rawConfig,
+    startup,
+    isPreload,
+  } = resolved
+  const startup_fn = debounce(function startup_fn(filename: string) {
+    if (isPreload(filename)) {
+      server.ws.send({ type: 'full-reload' })
+    } else {
+      startup()
+    }
+  })
   // There can't be any await statement here, it will cause `watcher.on` to miss the first trigger.
   watcher!.on('all', async (event, filepath) => {
     rawConfig.onwatch?.(event, filepath)
@@ -36,71 +45,22 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
         break
     }
 
-    startup(resolved, server, event, filepath)
+    if (rawConfig.startup !== false) {
+      startup_fn(filepath)
+    }
   })
 
   // first start
   // watcher!.emit('add', 'add', config.include2files[0])
 }
 
-function startupHandle(
-  config: ResolvedConfig,
-  server: ViteDevServer,
-  event: Parameters<Required<Configuration>['onstart']>[0]['event'],
-  filename: string,
-) {
-  const { config: rawConfig } = config
-
-  if (rawConfig.onstart) {
-    // Custom Electron App startup
-    rawConfig.onstart({
-      filename,
-      event,
-      startup,
-      viteDevServer: server,
-    })
-    return false
-  }
-
-  if (ispreload(filename)) {
-    server.ws.send({ type: 'full-reload' })
-  } else {
-    startup()
-  }
-}
-
-async function startup() {
-  // @ts-ignore
-  const electronPath = (await import('electron')).default as string
-
-  if (process.electronApp) {
-    process.electronApp.removeAllListeners()
-    process.electronApp.kill()
-  }
-
-  // Start Electron.app
-  process.electronApp = spawn(electronPath, ['.', '--no-sandbox'], { stdio: 'inherit' })
-  // Exit command after Electron.app exits
-  process.electronApp.once('exit', process.exit)
-}
-
-/**
- * Preload-Scripts
- * e.g.
- * - `xxx.preload.js`
- * - `xxx.preload.ts`
- */
-function ispreload(fielname: string) {
-  return extensions.some(ext => fielname.endsWith('preload' + ext))
-}
-
 function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
   let t: NodeJS.Timeout
-  return (...args: Parameters<Fn>) => {
+  return ((...args) => {
     // !t && fn(...args) // first call
     clearTimeout(t)
     t = setTimeout(() => fn(...args), delay)
-  }
+  }) as Fn
 }
 
 /**

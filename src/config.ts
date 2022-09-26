@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { normalizePath } from 'vite'
+import { type ViteDevServer, normalizePath } from 'vite'
 import type { TransformOptions } from 'esbuild'
 import fastGlob from 'fast-glob'
 import { watch, FSWatcher } from 'chokidar'
@@ -8,6 +8,8 @@ import { watch, FSWatcher } from 'chokidar'
 export interface Configuration {
   /** @default process.cwd() */
   root?: string
+  /** @default ['.ts', '.js', '.json'] */
+  extensions?: string[]
   /** Electron-Main, Preload-Scripts */
   include: string[]
   /** @default 'dist-electron' */
@@ -26,20 +28,16 @@ export interface Configuration {
     /** Stop subsequent build steps */
     stop: () => void
   }) => string | void | Promise<string | void>
-  /** Custom Electron App startup */
-  onstart?: (args: {
-    filename: | string
-    event: Parameters<Required<Configuration>['onwatch']>[0]
-    /** Electron App startup function */
-    startup: () => Promise<void>
-    viteDevServer: import('vite').ViteDevServer
-  }) => void
+  /** Disable Electron App auto start */
+  startup?: false
 }
 
 export interface ResolvedConfig {
   config: Configuration
   /** @default process.cwd() */
   root: string
+  /** @default ['.ts', '.js', '.json'] */
+  extensions: string[]
   /** Relative path */
   include: string[]
   /** Absolute path */
@@ -48,13 +46,28 @@ export interface ResolvedConfig {
   transformOptions: TransformOptions
   /** The value is `null` at build time */
   watcher: FSWatcher | null
+  /** The value is `null` at build time */
+  viteDevServer: ViteDevServer | null,
   /** From `config.include` */
   include2files: string[]
   /** src/foo.js -> dist/foo.js */
   src2dist: (filename: string) => string
+  /** Electron App startup function */
+  startup: (args?: string[]) => Promise<void>
+  /**
+   * Preload-Scripts
+   * e.g.
+   * - `xxx.preload.js`
+   * - `xxx.preload.ts`
+   */
+  isPreload: (fielname: string) => boolean
 }
 
-export async function resolveConfig(config: Configuration, command: 'build' | 'serve'): Promise<ResolvedConfig> {
+export async function resolveConfig(
+  config: Configuration,
+  command: 'build' | 'serve',
+  viteDevServer: ViteDevServer | null = null
+): Promise<ResolvedConfig> {
   // Vite hot reload vite.config.js
   process._resolved_config?.watcher?.close()
 
@@ -75,6 +88,7 @@ export async function resolveConfig(config: Configuration, command: 'build' | 's
   const resolved: ResolvedConfig = {
     config,
     root: resolvedRoot,
+    extensions: config.extensions ?? ['.ts', '.js', '.json'],
     include: include.map(p => path.isAbsolute(p)
       ? p.replace(resolvedRoot + '/', '')
       : p),
@@ -87,10 +101,30 @@ export async function resolveConfig(config: Configuration, command: 'build' | 's
       format: 'cjs',
     }, transformOptions),
     watcher: null,
+    viteDevServer,
     // @ts-ignore
     include2files: null,
     // @ts-ignore
     src2dist: null,
+
+    async startup(args = ['.', '--no-sandbox']) {
+      const { spawn } = await import('child_process')
+      // @ts-ignore
+      const electronPath = (await import('electron')).default as string
+
+      if (process.electronApp) {
+        process.electronApp.removeAllListeners()
+        process.electronApp.kill()
+      }
+
+      // Start Electron.app
+      process.electronApp = spawn(electronPath, args, { stdio: 'inherit' })
+      // Exit command after Electron.app exits
+      process.electronApp.once('exit', process.exit)
+    },
+    isPreload(fielname) {
+      return resolved.extensions.some(ext => fielname.endsWith('preload' + ext))
+    },
   }
 
   resolved.include2files = include2files(resolved)
@@ -105,8 +139,6 @@ export async function resolveConfig(config: Configuration, command: 'build' | 's
 
   return process._resolved_config = resolved
 }
-
-export const extensions = ['.ts', '.js', '.json']
 
 /**
  * @see https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
@@ -124,7 +156,7 @@ export const colours = {
 function include2files(config: ResolvedConfig) {
   return fastGlob
     .sync(include2globs(config))
-    .filter(p => extensions.includes(path.extname(p)))
+    .filter(p => config.extensions.includes(path.extname(p)))
 }
 
 function include2globs(config: ResolvedConfig, files = config.include) {
