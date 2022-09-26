@@ -1,9 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import { type ViteDevServer, normalizePath } from 'vite'
-import type { TransformOptions } from 'esbuild'
 import fastGlob from 'fast-glob'
-import { watch, FSWatcher } from 'chokidar'
+import { watch } from 'chokidar'
 
 export interface Configuration {
   /** @default process.cwd() */
@@ -43,11 +42,11 @@ export interface ResolvedConfig {
   /** Absolute path */
   outDir: string
   /** Options of `esbuild.transform()` */
-  transformOptions: TransformOptions
+  transformOptions: import('esbuild').TransformOptions
   /** The value is `null` at build time */
-  watcher: FSWatcher | null
+  watcher: import('chokidar').FSWatcher | null
   /** The value is `null` at build time */
-  viteDevServer: ViteDevServer | null,
+  viteDevServer: import('vite').ViteDevServer | null,
   /** From `config.include` */
   include2files: string[]
   /** src/foo.js -> dist/foo.js */
