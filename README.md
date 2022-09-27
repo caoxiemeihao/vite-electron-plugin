@@ -5,7 +5,7 @@ Fast, Electron plugin for Vite
 [![NPM version](https://img.shields.io/npm/v/vite-electron-plugin.svg)](https://npmjs.org/package/vite-electron-plugin)
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-electron-plugin.svg)](https://npmjs.org/package/vite-electron-plugin)
 
-- 🚀 Fast <sub><sup>(based on esbuild)</sup></sub>
+- 🚀 Fast <sub><sup>(Not Bundle, based on esbuild)</sup></sub>
 - 🔥 Hot reload
 - 📦 Out of the box
 - 🌱 What you see is what you get
@@ -62,20 +62,20 @@ export default {
 }
 ```
 
-You can use `process.env.VITE_DEV_SERVER_URL` when the Vite command is called 'serve'
+electron/main.ts
 
 ```js
-// electron/main.ts
-const win = new BrowserWindow({
-  title: 'Main window',
-})
+import { app, BrowserWindow } from 'electron'
 
-if (process.env.VITE_DEV_SERVER_URL) {
-  win.loadURL(process.env.VITE_DEV_SERVER_URL)
-} else {
-  // load your file
-  win.loadFile('yourOutputFile.html');
-}
+app.whenReady().then(() => {
+  const win = new BrowserWindow()
+
+  if (app.isPackaged) {
+    win.loadFile('your-build-output-index.html')
+  } else {
+    win.loadURL(process.env.VITE_DEV_SERVER_URL)
+  }
+})
 ```
 
 ## API <sub><sup>(Define)</sup></sub>
@@ -98,13 +98,12 @@ export interface Configuration {
   configResolved?: (config: Readonly<ResolvedConfig>) => void | Promise<void>
   /** Triggered by `include` file changes. You can emit some files in this hooks. */
   onwatch?: (envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void
-  /** Triggered by changes in .ts, .js, .json files in include */
+  /** Triggered by changes in `extensions` files in include */
   transform?: (args: {
-    /** .ts, .js, .json */
     filename: string
     code: string
-    /** Stop subsequent build steps */
-    stop: () => void
+    /** Skip subsequent build steps(esbuild.transform()) */
+    done: () => void
   }) => string | void | Promise<string | void>
   /** Disable Electron App auto start */
   startup?: false
