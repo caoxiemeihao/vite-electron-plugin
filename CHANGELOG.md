@@ -1,3 +1,10 @@
+## 0.2.1 (2022-09-27)
+
+- 51a7027 v0.2.1
+- b5e30c8 docs: v0.2.1
+- 9ff0305 refactor:  transform `args.stop()` -> `args.done()`
+- 9ba3d8e fix(🐞): use `normalizePath()`
+
 ## 0.2.0 (2022-09-26)
 
 - 77a7ad0 v0.2.0
