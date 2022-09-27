@@ -19,13 +19,12 @@ export interface Configuration {
   configResolved?: (config: Readonly<ResolvedConfig>) => void | Promise<void>
   /** Triggered by `include` file changes. You can emit some files in this hooks. */
   onwatch?: (envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void
-  /** Triggered by changes in .ts, .js, .json files in include */
+  /** Triggered by changes in `extensions` files in include */
   transform?: (args: {
-    /** .ts, .js, .json */
     filename: string
     code: string
-    /** Stop subsequent build steps */
-    stop: () => void
+    /** Skip subsequent build steps(esbuild.transform()) */
+    done: () => void
   }) => string | void | Promise<string | void>
   /** Disable Electron App auto start */
   startup?: false

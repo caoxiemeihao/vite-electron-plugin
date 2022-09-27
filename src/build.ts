@@ -22,13 +22,13 @@ export async function build(config: ResolvedConfig, files: string | string[]) {
 
     const distpath = path.dirname(distname)
     let code = fs.readFileSync(filename, 'utf8')
-    let stop = false
+    let done = false
 
     const transformed = await rawConfig.transform?.({
       filename,
       code,
-      stop() {
-        stop = true
+      done() {
+        done = true
       },
     })
 
@@ -36,7 +36,7 @@ export async function build(config: ResolvedConfig, files: string | string[]) {
       code = transformed
     }
 
-    if (!stop) {
+    if (!done) {
       switch (path.extname(filename)) {
         case '.ts':
         case '.js':
