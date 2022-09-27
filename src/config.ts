@@ -89,8 +89,8 @@ export async function resolveConfig(
     root: resolvedRoot,
     extensions: config.extensions ?? ['.ts', '.js', '.json'],
     include: include.map(p => path.isAbsolute(p)
-      ? p.replace(resolvedRoot + '/', '')
-      : p),
+      ? normalizePath(p).replace(resolvedRoot + '/', '')
+      : normalizePath(p)),
     outDir: path.isAbsolute(defaultOutDir)
       ? defaultOutDir
       : path.posix.join(resolvedRoot, defaultOutDir),
@@ -166,7 +166,7 @@ function include2globs(config: ResolvedConfig, files = config.include) {
       try {
         const stat = fs.statSync(p)
         if (stat.isDirectory()) {
-          return path.join(p, '**/*')
+          return path.posix.join(p, '**/*')
         }
       } catch { }
       return p
@@ -178,6 +178,8 @@ function src2dist(
   filename: string,
   relpaceTS = true,
 ) {
+  filename = normalizePath(filename)
+
   const { root, outDir } = config
   if (src2dist.reduce1level === false) {
     // This behavior is more like tsc

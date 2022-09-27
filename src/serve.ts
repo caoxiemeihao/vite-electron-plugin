@@ -1,5 +1,5 @@
 import fs from 'fs'
-import type { ViteDevServer } from 'vite'
+import { type ViteDevServer } from 'vite'
 import {
   type Configuration,
   resolveConfig,
@@ -26,6 +26,7 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
   })
   // There can't be any await statement here, it will cause `watcher.on` to miss the first trigger.
   watcher!.on('all', async (event, filepath) => {
+    // 🚨 filepath = normalizePath(filepath)
     rawConfig.onwatch?.(event, filepath)
 
     const distpath = src2dist(filepath)

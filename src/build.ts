@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { normalizePath } from 'vite'
 import { type Loader, transform } from 'esbuild'
 import {
   type ResolvedConfig,
@@ -9,7 +10,7 @@ import {
 export async function build(config: ResolvedConfig, files: string | string[]) {
   const { src2dist, transformOptions, config: rawConfig } = config
 
-  for (const filename of [files].flat()) {
+  for (const filename of [files].flat().map(file => normalizePath(file))) {
     const distname = src2dist(filename)
     if (distname === filename) {
       console.log(
