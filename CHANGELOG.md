@@ -1,3 +1,13 @@
+## 0.3.0 (2022-09-28)
+
+- f2a9600 v0.3.0
+- 62496b4 docs: v0.3.0
+- f160da6 refactor: custom start APP with v0.3.0
+- f23a007 feat: build plugin
+- 2a14f4c update
+- 76733a0 feat(plugin): `customStart()`
+- 1b9477b feat(🌱): support plugin
+
 ## 0.2.1 (2022-09-27)
 
 - 51a7027 v0.2.1

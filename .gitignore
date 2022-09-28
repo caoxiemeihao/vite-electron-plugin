@@ -110,5 +110,5 @@ package-lock.json
 # pnpm-lock.yaml
 yarn.lock
 
-index.js
-index.mjs
+/index.js
+/index.mjs

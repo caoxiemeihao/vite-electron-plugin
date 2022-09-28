@@ -1,16 +1,17 @@
-import { defineConfig } from 'vite'
+import {
+  type InlineConfig,
+  type UserConfig,
+  type BuildOptions,
+  mergeConfig,
+  build,
+} from 'vite'
 import { builtinModules } from 'module'
 import pkg from './package.json'
 
-export default defineConfig({
+const config: UserConfig = {
   build: {
     minify: false,
-    outDir: '',
-    lib: {
-      entry: 'src/index.ts',
-      formats: ['cjs', 'es'],
-      fileName: format => format === 'es' ? '[name].mjs' : '[name].js',
-    },
+    emptyOutDir: false,
     rollupOptions: {
       external: [
         'electron',
@@ -22,4 +23,37 @@ export default defineConfig({
       ],
     },
   },
-})
+}
+
+export default mergeConfig(config, {
+  plugins: [{
+    name: 'build-plugin',
+    configResolved(config) {
+      buildPlugin(config.build.watch)
+    },
+  }],
+  build: {
+    outDir: '',
+    lib: {
+      entry: 'src/index.ts',
+      formats: ['cjs', 'es'],
+      fileName: format => format === 'es' ? '[name].mjs' : '[name].js',
+    },
+  },
+} as UserConfig)
+
+function buildPlugin(watch: Required<BuildOptions>['watch']) {
+  build(mergeConfig(config, {
+    // Avoid recursive builds
+    configFile: false,
+    build: {
+      watch,
+      outDir: 'plugin',
+      lib: {
+        entry: 'plugin/index.ts',
+        formats: ['cjs', 'es'],
+        fileName: format => format === 'es' ? '[name].mjs' : '[name].js',
+      },
+    },
+  } as InlineConfig))
+}
