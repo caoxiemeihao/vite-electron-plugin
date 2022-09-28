@@ -95,7 +95,7 @@ You can freely modify the `config` argument in ths hooks or use.
 - **Type**: `(envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void`
 - **Kind**: `async`, `parallel`
 
-Triggered by `include` file changes. You can emit some files in this hooks. You can copy files here, or even restart the App.
+Triggered by `include` file changes. You can emit some files in this hooks. You can copy files here, or even restart the Electron App.
 
 #### `transform`
 
@@ -109,7 +109,7 @@ Triggered by changes in `extensions` files in include.
 - **Type**: `(args: { filename: string, distname: string }) => void`
 - **Kind**: `async`, `parallel`
 
-Triggered when `transform()` ends
+Triggered when `transform()` ends.
 
 ## Builtin Plugin
 
@@ -121,9 +121,9 @@ import {
 } from 'vite-electron-plugin/plugin'
 ```
 
-- [x] `customStart` custom start Electron App
-- [ ] `alias` same as Vite's `resolve.alias`
-- [ ] `copy` copy static files to dist directory
+- ✅ `customStart` custom start Electron App
+- ❌ `alias` same as Vite's `resolve.alias`
+- ❌ `copy` copy static files to dist directory
 
 ## API <sub><sup>(Define)</sup></sub>
 
