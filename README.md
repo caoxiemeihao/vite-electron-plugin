@@ -6,6 +6,7 @@ Fast, Electron plugin for Vite
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-electron-plugin.svg)](https://npmjs.org/package/vite-electron-plugin)
 
 - 🚀 Fast <sub><sup>(Not Bundle, based on esbuild)</sup></sub>
+- 🎯 Plugin <sub><sup>(Like Vite's plugin)</sup></sub>
 - 🔥 Hot reload
 - 📦 Out of the box
 - 🌱 What you see is what you get
@@ -78,35 +79,88 @@ app.whenReady().then(() => {
 })
 ```
 
+## Plugin API
+
+The design of plugin is similar to [Vite's plugin](https://vitejs.dev/guide/api-plugin.html), but simpler. only four hooks.
+
+#### `configResolved`
+
+- **Type**: `(config: ResolvedConfig) => void | Promise<void>`
+- **Kind**: `async`, `sequential`
+
+You can freely modify the `config` argument in ths hooks or use.
+
+#### `onwatch` <sub><sup>serve only</sup></sub>
+
+- **Type**: `(envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void`
+- **Kind**: `async`, `parallel`
+
+Triggered by `include` file changes. You can emit some files in this hooks. You can copy files here, or even restart the App.
+
+#### `transform`
+
+- **Type**: `(args: { filename: string, code: string, done: () => void }) => string | import('esbuild').TransformResult | void | Promise<string | import('esbuild').TransformResult | void>`
+- **Kind**: `async`, `sequential`
+
+Triggered by changes in `extensions` files in include.
+
+#### `ondone`
+
+- **Type**: `(args: { filename: string, distname: string }) => void`
+- **Kind**: `async`, `parallel`
+
+Triggered when `transform()` ends
+
+## Builtin Plugin
+
+```ts
+import {
+  customStart,
+  alias,
+  copy,
+} from 'vite-electron-plugin/plugin'
+```
+
+- [x] `customStart` custom start Electron App
+- [ ] `alias` same as Vite's `resolve.alias`
+- [ ] `copy` copy static files to dist directory
+
 ## API <sub><sup>(Define)</sup></sub>
 
 ###### `electron(config: Configuration)`
 
 ```ts
 export interface Configuration {
+  /** Like Vite's plugin */
+  plugins?: {
+    name: string
+    configResolved?: (config: ResolvedConfig) => void | Promise<void>
+    /** Triggered by `include` file changes. You can emit some files in this hooks. */
+    onwatch?: (envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void
+    /** Triggered by changes in `extensions` files in include */
+    transform?: (args: {
+      /** Raw filename */
+      filename: string
+      code: string
+      /** Skip subsequent transform hooks */
+      done: () => void
+    }) => string | import('esbuild').TransformResult | void | Promise<string | import('esbuild').TransformResult | void>
+    /** Triggered when `transform()` ends */
+    ondone?: (args: {
+      /** Raw filename */
+      filename: string
+      /** Dist filename */
+      distname: string
+    }) => void
+  }[],
   /** @default process.cwd() */
   root?: string
-  /** @default ['.ts', '.js', '.json'] */
-  extensions?: string[]
   /** Electron-Main, Preload-Scripts */
   include: string[]
   /** @default 'dist-electron' */
   outDir?: string
   /** Options of `esbuild.transform()` */
   transformOptions?: import('esbuild').TransformOptions
-
-  configResolved?: (config: Readonly<ResolvedConfig>) => void | Promise<void>
-  /** Triggered by `include` file changes. You can emit some files in this hooks. */
-  onwatch?: (envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void
-  /** Triggered by changes in `extensions` files in include */
-  transform?: (args: {
-    filename: string
-    code: string
-    /** Skip subsequent build steps(esbuild.transform()) */
-    done: () => void
-  }) => string | void | Promise<string | void>
-  /** Disable Electron App auto start */
-  startup?: false
 }
 ```
 
@@ -114,33 +168,32 @@ export interface Configuration {
 
 ```ts
 export interface ResolvedConfig {
-  config: Configuration
+  plugins: Required<Configuration>['plugins']
   /** @default process.cwd() */
   root: string
-  /** @default ['.ts', '.js', '.json'] */
-  extensions: string[]
   /** Relative path */
   include: string[]
   /** Absolute path */
   outDir: string
   /** Options of `esbuild.transform()` */
   transformOptions: import('esbuild').TransformOptions
+
+  config: Configuration
+  /** Vite's command */
+  command: 'build' | 'serve',
+  /** @default ['.ts', '.tsx', '.js', '.jsx'] */
+  extensions: string[]
   /** The value is `null` at build time */
   watcher: import('chokidar').FSWatcher | null
   /** The value is `null` at build time */
   viteDevServer: import('vite').ViteDevServer | null,
-  /** From `config.include` */
-  include2files: string[]
-  /** src/foo.js -> dist/foo.js */
-  src2dist: (filename: string) => string
-  /** Electron App startup function */
-  startup: (args?: string[]) => Promise<void>
-  /**
-   * Preload-Scripts
-   * e.g.
-   * - `xxx.preload.js`
-   * - `xxx.preload.ts`
-   */
-  isPreload: (fielname: string) => boolean
+  /** Unstable functions */
+  _fn: {
+    /** Electron App startup function */
+    startup: (args?: string[]) => void
+    include2files: (config: ResolvedConfig, include?: string[]) => string[]
+    include2globs: (config: ResolvedConfig, include?: string[]) => string[]
+    include2dist: (filename: string, replace2js?: boolean) => string
+  }
 }
 ```
