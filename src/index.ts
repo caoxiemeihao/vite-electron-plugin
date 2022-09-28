@@ -1,16 +1,24 @@
-import type { UserConfig, Plugin } from 'vite'
+import fs from 'fs'
+import {
+  type UserConfig,
+  type Plugin as VitePlugin,
+} from 'vite'
 import { bootstrap } from './serve'
 import { build } from './build'
 import {
   type Configuration,
   type ResolvedConfig,
+  type Plugin,
   resolveConfig,
 } from './config'
+import { name } from '../package.json'
+import { ensuredir, STATIC_JS_EXTENSIONS } from './utils'
 
 // public export
 export {
   type Configuration,
   type ResolvedConfig,
+  type Plugin,
   defineConfig,
   electron as default,
 }
@@ -19,9 +27,7 @@ function defineConfig(config: Configuration) {
   return config
 }
 
-function electron(config: Configuration): Plugin[] {
-  const name = 'vite-plugin-electron-unbuild'
-
+function electron(config: Configuration): VitePlugin[] {
   return [
     {
       name: `${name}:serve`,
@@ -38,8 +44,25 @@ function electron(config: Configuration): Plugin[] {
       },
       async closeBundle() {
         const resolved = await resolveConfig(config, 'build')
-        const { include2files } = resolved
-        await build(resolved, include2files)
+        const { _fn, extensions, plugins } = resolved
+        for (const filename of _fn.include2files(resolved)) {
+          const js = extensions.some(ext => filename.endsWith(ext))
+          const staticjs = STATIC_JS_EXTENSIONS.some(ext => filename.endsWith(ext))
+          const distname = _fn.include2dist(filename, js)
+          if (js) {
+            await build(resolved, filename)
+          } else if (staticjs) {
+            // static files
+            fs.copyFileSync(filename, ensuredir(distname))
+          }
+
+          if (js || staticjs) {
+            for (const plugin of plugins) {
+              // call ondone hooks
+              plugin.ondone?.({ filename, distname })
+            }
+          }
+        }
       },
     },
   ]

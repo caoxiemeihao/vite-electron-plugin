@@ -1,67 +1,40 @@
 import fs from 'fs'
-import path from 'path'
-import { normalizePath } from 'vite'
-import { type Loader, transform } from 'esbuild'
-import {
-  type ResolvedConfig,
-  colours,
-} from './config'
+import { type ResolvedConfig } from './config'
+import { colours, ensuredir } from './utils'
 
-export async function build(config: ResolvedConfig, files: string | string[]) {
-  const { src2dist, transformOptions, config: rawConfig } = config
+export async function build(config: ResolvedConfig, filename: string) {
+  const { _fn, plugins } = config
+  const distname = _fn.include2dist(filename, true)
 
-  for (const filename of [files].flat().map(file => normalizePath(file))) {
-    const distname = src2dist(filename)
-    if (distname === filename) {
-      console.log(
-        colours.yellow('Input and output are the same file\n '),
-        filename, '->', distname,
-      )
-      return
-    }
-
-    const distpath = path.dirname(distname)
+  if (distname === filename) {
+    console.log(
+      colours.yellow('Input and output are the same file\n '),
+      filename, '->', distname,
+    )
+  } else {
     let code = fs.readFileSync(filename, 'utf8')
     let done = false
-
-    const transformed = await rawConfig.transform?.({
-      filename,
-      code,
-      done() {
-        done = true
-      },
-    })
-
-    if (typeof transformed === 'string') {
-      code = transformed
-    }
-
-    if (!done) {
-      switch (path.extname(filename)) {
-        case '.ts':
-        case '.js':
-          try {
-            const result = await transform(code, {
-              loader: path.extname(filename).slice(1) as Loader,
-              ...transformOptions,
-            })
-            if (result.warnings.length) {
-              console.log(colours.yellow(result.warnings.map(e => e.text).join('\n')))
-            }
-
-            code = result.code
-          } catch (error) {
-            console.log(colours.red(error as string))
-          }
-          break
+    for (const plugin of plugins) {
+      if (done) break
+      // call transform hooks
+      const result = await plugin.transform?.({
+        filename,
+        code,
+        done() { done = true },
+      })
+      if (!result) continue
+      if (typeof result === 'string') {
+        code = result
+      } else if (result !== null && typeof result === 'object') {
+        if (result.warnings.length) {
+          console.log(colours.yellow(result.warnings.map(e => e.text).join('\n')))
+        }
+        code = result.code
+        // TODO: sourcemap
       }
     }
 
-    if (!fs.existsSync(distpath)) {
-      fs.mkdirSync(distpath, { recursive: true })
-    }
-
-    fs.writeFileSync(distname, code)
+    fs.writeFileSync(ensuredir(distname), code)
     console.log(colours.cyan(`[${new Date().toLocaleTimeString()}]`), distname)
   }
 }
