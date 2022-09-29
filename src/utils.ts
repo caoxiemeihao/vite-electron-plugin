@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import type { ResolvedConfig } from './config'
 
 export function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
   let t: NodeJS.Timeout
@@ -21,11 +22,19 @@ export const colours = {
   red: (str: string) => colours.$_$(31)(str),
 }
 
+export const JS_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx']
 export const STATIC_JS_EXTENSIONS = ['.json', '.node', '.wasm']
 
-export function ensuredir(filename: string): string {
+export function ensureDir(filename: string): string {
   const dir = path.dirname(filename)
   !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true })
 
   return filename
+}
+
+export function jsType(filename: string) {
+  return {
+    js: JS_EXTENSIONS.some(ext => filename.endsWith(ext)),
+    static: STATIC_JS_EXTENSIONS.some(ext => filename.endsWith(ext))
+  }
 }

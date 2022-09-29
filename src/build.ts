@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { type ResolvedConfig } from './config'
-import { colours, ensuredir } from './utils'
+import { colours, ensureDir } from './utils'
 
 export async function build(config: ResolvedConfig, filename: string) {
   const { _fn, plugins } = config
@@ -34,7 +34,7 @@ export async function build(config: ResolvedConfig, filename: string) {
       }
     }
 
-    fs.writeFileSync(ensuredir(distname), code)
+    fs.writeFileSync(ensureDir(distname), code)
     console.log(colours.cyan(`[${new Date().toLocaleTimeString()}]`), distname)
   }
 }
