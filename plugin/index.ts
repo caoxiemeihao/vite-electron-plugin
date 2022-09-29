@@ -1,52 +1,24 @@
+import type { ViteDevServer } from 'vite'
 import type { Plugin, ResolvedConfig } from '..'
 
 export function customStart(callback?: (args?: {
   startup: ResolvedConfig['_fn']['startup']
   filename: string
+  viteDevServer: ViteDevServer
 }) => void): Plugin {
   let config: ResolvedConfig
-  let startup: (filename: string) => void
 
   return {
     name: 'custom-start',
     configResolved(_config) {
-      const { command, viteDevServer, _fn } = config = _config
-      const index = _config.plugins.findIndex(plugin => plugin.name === ':startup')
-      if (index > -1) {
-        // Remove internal startup function
-        config.plugins.slice(index, 1)
-      }
-
-      if (command === 'serve' && callback) {
-        startup = debounce(function startup_fn(filename: string) {
-          /**
-           * Preload-Scripts
-           * e.g.
-           * - `xxx.preload.js`
-           * - `xxx.preload.ts`
-           */
-          const ispreload = config.extensions.some(ext => filename.endsWith('preload' + ext))
-          if (ispreload) {
-            viteDevServer!.ws.send({ type: 'full-reload' })
-          } else {
-            callback({ startup: _fn.startup, filename })
-          }
-        })
-      }
+      config = _config
+      // Remove internal startup function
+      config.plugins.slice(_config.plugins.findIndex(plugin => plugin.name === ':startup'), 1)
     },
     ondone({ filename }) {
-      if (config?.command === 'serve') {
-        startup(filename)
+      if (config?.command === 'serve' && callback) {
+        callback({ startup: config._fn.startup, filename, viteDevServer: config.viteDevServer! })
       }
     },
   }
-}
-
-function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
-  let t: NodeJS.Timeout
-  return ((...args) => {
-    // !t && fn(...args) // first call
-    clearTimeout(t)
-    t = setTimeout(() => fn(...args), delay)
-  }) as Fn
 }
