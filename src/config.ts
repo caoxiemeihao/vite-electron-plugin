@@ -4,6 +4,7 @@ import { type ViteDevServer, normalizePath } from 'vite'
 import fastGlob from 'fast-glob'
 import { watch } from 'chokidar'
 import { resolvePlugins } from './plugin'
+import { JS_EXTENSIONS } from './utils'
 
 export interface Configuration {
   /** Like Vite's plugin */
@@ -108,7 +109,7 @@ export async function resolveConfig(
 
     config,
     command,
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    extensions: JS_EXTENSIONS,
     watcher: null,
     viteDevServer,
     _fn: {
@@ -223,6 +224,7 @@ function include2dist(
       ? file.slice(file.indexOf('/') + 1)
       : file
   )
-  return replace2js ? distname.replace(path.extname(distname), '.js') : distname
+  const extname = path.extname(distname)
+  return (replace2js && config.extensions.includes(extname)) ? distname.replace(extname, '.js') : distname
 }
 include2dist.reduce1level = false

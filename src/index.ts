@@ -12,7 +12,7 @@ import {
   resolveConfig,
 } from './config'
 import { name } from '../package.json'
-import { ensuredir, STATIC_JS_EXTENSIONS } from './utils'
+import { ensureDir, jsType } from './utils'
 
 // public export
 export {
@@ -44,19 +44,18 @@ function electron(config: Configuration): VitePlugin[] {
       },
       async closeBundle() {
         const resolved = await resolveConfig(config, 'build')
-        const { _fn, extensions, plugins } = resolved
+        const { _fn, plugins } = resolved
         for (const filename of _fn.include2files(resolved)) {
-          const js = extensions.some(ext => filename.endsWith(ext))
-          const staticjs = STATIC_JS_EXTENSIONS.some(ext => filename.endsWith(ext))
-          const distname = _fn.include2dist(filename, js)
-          if (js) {
+          const js_type = jsType(filename)
+          const distname = _fn.include2dist(filename, true)
+          if (js_type.js) {
             await build(resolved, filename)
-          } else if (staticjs) {
+          } else if (js_type.static) {
             // static files
-            fs.copyFileSync(filename, ensuredir(distname))
+            fs.copyFileSync(filename, ensureDir(distname))
           }
 
-          if (js || staticjs) {
+          if (js_type.js || js_type.static) {
             for (const plugin of plugins) {
               // call ondone hooks
               plugin.ondone?.({ filename, distname })

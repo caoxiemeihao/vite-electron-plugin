@@ -5,7 +5,7 @@ import {
   resolveConfig,
 } from './config'
 import { build } from './build'
-import { ensuredir, STATIC_JS_EXTENSIONS } from './utils'
+import { ensureDir, jsType } from './utils'
 
 export async function bootstrap(config: Configuration, server: ViteDevServer) {
   process.env.VITE_DEV_SERVER_URL = resolveEnv(server)!.url
@@ -15,12 +15,13 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
     _fn,
     watcher,
     plugins,
-    extensions,
   } = resolved
   // There can't be any await statement here, it will cause `watcher.on` to miss the first trigger.
   watcher!.on('all', async (event, _filepath) => {
     const filepath = normalizePath(_filepath)
-    const distpath = _fn.include2dist(filepath)
+    const distpath = _fn.include2dist(filepath, true)
+    const js_type = jsType(filepath)
+    let run_done = false
 
     // call onwatch hooks
     for (const plugin of plugins) {
@@ -30,34 +31,36 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
     switch (event) {
       case 'add':
       case 'change': {
-        const filename = filepath
-        const js = extensions.some(ext => filename.endsWith(ext))
-        const staticjs = STATIC_JS_EXTENSIONS.some(ext => filename.endsWith(ext))
-        const distname = _fn.include2dist(filename, js)
-        if (js) {
-          await build(resolved, filename)
-        } else if (staticjs) {
+        if (js_type.js) {
+          await build(resolved, filepath)
+        } else if (js_type.static) {
           // static files
-          fs.copyFileSync(filename, ensuredir(distname))
+          fs.copyFileSync(filepath, ensureDir(distpath))
         }
 
-        if (js || staticjs) {
-          for (const plugin of plugins) {
-            // call ondone hooks
-            plugin.ondone?.({ filename, distname })
-          }
-        }
+        run_done = js_type.js || js_type.static
         break
       }
       case 'addDir':
         // !fs.existsSync(distpath) && fs.mkdirSync(distpath, { recursive: true })
         break
       case 'unlink':
-        fs.existsSync(distpath) && fs.unlinkSync(distpath)
+        if (fs.existsSync(distpath)) {
+          fs.unlinkSync(distpath)
+          run_done = js_type.js || js_type.static
+        }
         break
       case 'unlinkDir':
         fs.existsSync(distpath) && fs.rmSync(distpath, { recursive: true, force: true })
         break
+    }
+
+    if (run_done) {
+      run_done = false
+      for (const plugin of plugins) {
+        // call ondone hooks
+        plugin.ondone?.({ filename: filepath, distname: distpath })
+      }
     }
   })
 }

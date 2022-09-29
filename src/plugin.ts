@@ -36,21 +36,24 @@ function esbuild(): Plugin {
 
 function startup(): Plugin {
   let config: ResolvedConfig
-  let startup: (filename: string) => void
+  let startup: () => void
+  const files: string[] = []
 
   return {
     name: ':startup',
     configResolved(_config) {
       const { command, viteDevServer, _fn } = config = _config
       if (command === 'serve') {
-        startup = debounce(function startup_fn(filename: string) {
+        startup = debounce(function startup_fn() {
           /**
            * Preload-Scripts
            * e.g.
            * - `xxx.preload.js`
            * - `xxx.preload.ts`
            */
-          const ispreload = config.extensions.some(ext => filename.endsWith('preload' + ext))
+          const ispreload = config.extensions.some(ext => files.every(file => file.endsWith('preload' + ext)))
+          files.length = 0
+
           if (ispreload) {
             viteDevServer!.ws.send({ type: 'full-reload' })
           } else {
@@ -61,7 +64,8 @@ function startup(): Plugin {
     },
     ondone({ filename }) {
       if (config?.command === 'serve') {
-        startup(filename)
+        files.push(filename)
+        startup()
       }
     },
   }
