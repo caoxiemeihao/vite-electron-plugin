@@ -1,3 +1,14 @@
+## 0.3.1 (2022-09-29)
+
+- e6615ec v0.3.1
+- d6759a3 docs: v0.3.1
+- d783812 chore: update deps
+- 4003da5 chore: update custom-start-electron-app
+- 00d9cd0 refactor(plugin): better `customStart()`
+- 345dc90 fix(🐞): `ondone` not work
+- d715d0c chore(plugin): optimize
+- 9d4925a docs: update
+
 ## 0.3.0 (2022-09-28)
 
 - f2a9600 v0.3.0
