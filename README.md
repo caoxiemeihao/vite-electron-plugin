@@ -41,8 +41,9 @@ Let's use the official [template-vanilla-ts](https://github.com/vitejs/vite/tree
 + └── vite.config.ts
 ```
 
-- 🚨 *By default, the files in `electron` folder will be built into the `dist-electron`*
-- 🚨 *Currently, `"type": "module"` is not supported in Electron*
+- 🚨 Any files ending with `preload.ext` are considered Preload-Scripts(**e.g.** `preload.ts`, `foo.preload.js`), and when they change, they will trigger the Electron-Renderer process to reload instead of restarting the entire Electron App.
+- 🚨 By default, the files in `electron` folder will be built into the `dist-electron`
+- 🚨 Currently, `"type": "module"` is not supported in Electron
 
 ## Usage
 
@@ -81,7 +82,7 @@ app.whenReady().then(() => {
 
 ## Plugin API
 
-The design of plugin is similar to [Vite's plugin](https://vitejs.dev/guide/api-plugin.html), but simpler. only four hooks.
+> The design of plugin is similar to [Vite's plugin](https://vitejs.dev/guide/api-plugin.html). But simpler, only 4 hooks in total.
 
 #### `configResolved`
 
@@ -114,16 +115,28 @@ Triggered when `transform()` ends.
 ## Builtin Plugin
 
 ```ts
+import electron from 'vite-electron-plugin'
 import {
+  alias, // TODO: 2022-09-29
   customStart,
-  alias,
-  copy,
 } from 'vite-electron-plugin/plugin'
-```
 
-- ✅ `customStart` custom start Electron App
-- ❌ `alias` same as Vite's `resolve.alias`
-- ❌ `copy` copy static files to dist directory
+export default {
+  plugins: [
+    electron({
+      plugins: [
+        alias: {
+          // Absolute path are recommended for alias, which will automatically calculate relative path
+          '@': path.join(__dirname, 'src'),
+        },
+        customStart(({ startup }) => {
+          // Do something
+        }),
+      ],
+    }),
+  ],
+}
+```
 
 ## API <sub><sup>(Define)</sup></sub>
 
