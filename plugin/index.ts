@@ -2,6 +2,7 @@ import path from 'path'
 import type { ViteDevServer } from 'vite'
 import type { Plugin, ResolvedConfig } from '..'
 
+// TODO: use ast implement alias plugin
 export function alias(options: {
   find: string | RegExp
   replacement: string
