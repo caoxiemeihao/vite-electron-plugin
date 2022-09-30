@@ -19,7 +19,7 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
   // There can't be any await statement here, it will cause `watcher.on` to miss the first trigger.
   watcher!.on('all', async (event, _filepath) => {
     const filepath = normalizePath(_filepath)
-    const distpath = _fn.include2dist(filepath, true)
+    const distpath = _fn.replace2dist(filepath, true)
     const js_type = jsType(filepath)
     let run_done = false
 

@@ -1,3 +1,16 @@
+## 0.3.2 (2022-09-30)
+
+- b7dc155 `index.js` -> `index.cjs`, `index.mjs` -> `index.js`
+- 20f32a1 upate
+- e0fc882 add plugin/index.js
+- a244e52 chore:  U transform ReturnType
+- 1501c5d chore(plugin): comments
+- cc326f2 feat: examples/alias
+- 7a00f7b feat(plugin): alias 🌱
+- 1423687 fix(🐞): exclude `.d.ts`
+- 5d1fef1 chore: optimize
+- 3a737e9 ignore `plugin/index.js`
+
 ## 0.3.1 (2022-09-29)
 
 - e6615ec v0.3.1

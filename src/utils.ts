@@ -34,7 +34,7 @@ export function ensureDir(filename: string): string {
 
 export function jsType(filename: string) {
   return {
-    js: JS_EXTENSIONS.some(ext => filename.endsWith(ext)),
+    js: !filename.endsWith('.d.ts') && JS_EXTENSIONS.some(ext => filename.endsWith(ext)),
     static: STATIC_JS_EXTENSIONS.some(ext => filename.endsWith(ext))
   }
 }

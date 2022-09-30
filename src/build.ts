@@ -4,7 +4,7 @@ import { colours, ensureDir } from './utils'
 
 export async function build(config: ResolvedConfig, filename: string) {
   const { _fn, plugins } = config
-  const distname = _fn.include2dist(filename, true)
+  const distname = _fn.replace2dist(filename, true)
 
   if (distname === filename) {
     console.log(
