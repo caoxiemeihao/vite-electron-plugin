@@ -21,7 +21,7 @@ export interface Configuration {
       /** Skip subsequent transform hooks */
       done: () => void
     }) => string | import('esbuild').TransformResult | void | Promise<string | import('esbuild').TransformResult | void>
-    /** Triggered when `transform()` ends */
+    /** Triggered when `transform()` ends or a file in `extensions` is removed */
     ondone?: (args: {
       /** Raw filename */
       filename: string
@@ -59,13 +59,13 @@ export interface ResolvedConfig {
   watcher: import('chokidar').FSWatcher | null
   /** The value is `null` at build time */
   viteDevServer: import('vite').ViteDevServer | null,
-  /** Unstable functions */
+  /** Internal functions (🚨 Experimental) */
   _fn: {
     /** Electron App startup function */
     startup: (args?: string[]) => void
     include2files: (config: ResolvedConfig, include?: string[]) => string[]
     include2globs: (config: ResolvedConfig, include?: string[]) => string[]
-    include2dist: (filename: string, replace2js?: boolean) => string
+    replace2dist: (filename: string, replace2js?: boolean) => string
   }
 }
 
@@ -128,22 +128,15 @@ export async function resolveConfig(
         // Exit command after Electron.app exits
         process.electronApp.once('exit', process.exit)
       },
-      // @ts-ignore
-      include2files: null,
-      // @ts-ignore
-      include2globs: null,
-      // @ts-ignore
-      include2dist: null,
+      include2files,
+      include2globs,
+      replace2dist: (filename: string, replace2js?: boolean) => input2output(resolved, filename, replace2js),
     },
   }
 
   if (command === 'serve') {
     resolved.watcher = watch(/* 🚨 Any file */include2globs(resolved))
   }
-
-  resolved._fn.include2files = include2files
-  resolved._fn.include2globs = include2globs
-  resolved._fn.include2dist = (filename: string, replace2js?: boolean) => include2dist(resolved, filename, replace2js)
 
   for (const plugin of resolved.plugins) {
     // call configResolved hooks
@@ -177,7 +170,7 @@ function include2globs(config: ResolvedConfig, files = config.include) {
     })
 }
 
-function include2dist(
+function input2output(
   config: ResolvedConfig,
   filename: string,
   replace2js = false,
@@ -185,7 +178,7 @@ function include2dist(
   filename = normalizePath(filename)
 
   const { root, outDir } = config
-  if (include2dist.reduce1level === false) {
+  if (input2output.reduce1level === false) {
     // This behavior is more like tsc
     //
     // electron -> dist-electron
@@ -212,14 +205,14 @@ function include2dist(
     // │ │ └─┬ main.js
     // │ │   └── index.js
     // │ └── preload.js
-    include2dist.reduce1level = include2files(config)
+    input2output.reduce1level = include2files(config)
       .map(file => file.replace(root + '/', ''))
       .every(file => file.includes('/'))
   }
   const file = filename.replace(root + '/', '')
   const distname = path.posix.join(
     outDir,
-    include2dist.reduce1level
+    input2output.reduce1level
       // src/main.js -> main.js
       ? file.slice(file.indexOf('/') + 1)
       : file
@@ -227,4 +220,4 @@ function include2dist(
   const extname = path.extname(distname)
   return (replace2js && config.extensions.includes(extname)) ? distname.replace(extname, '.js') : distname
 }
-include2dist.reduce1level = false
+input2output.reduce1level = false

@@ -47,7 +47,7 @@ function electron(config: Configuration): VitePlugin[] {
         const { _fn, plugins } = resolved
         for (const filename of _fn.include2files(resolved)) {
           const js_type = jsType(filename)
-          const distname = _fn.include2dist(filename, true)
+          const distname = _fn.replace2dist(filename, true)
           if (js_type.js) {
             await build(resolved, filename)
           } else if (js_type.static) {
