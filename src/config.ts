@@ -20,7 +20,7 @@ export interface Configuration {
       code: string
       /** Skip subsequent transform hooks */
       done: () => void
-    }) => string | import('esbuild').TransformResult | void | Promise<string | import('esbuild').TransformResult | void>
+    }) => string | null | void | import('esbuild').TransformResult | Promise<string | null | void | import('esbuild').TransformResult>
     /** Triggered when `transform()` ends or a file in `extensions` is removed */
     ondone?: (args: {
       /** Raw filename */
