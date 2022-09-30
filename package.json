@@ -6,12 +6,12 @@
   "types": "src",
   "exports": {
     ".": {
-      "import": "./index.mjs",
-      "require": "./index.js"
+      "import": "./index.js",
+      "require": "./index.cjs"
     },
     "./plugin": {
-      "import": "./plugin/index.mjs",
-      "require": "./plugin/index.js"
+      "import": "./plugin/index.js",
+      "require": "./plugin/index.cjs"
     }
   },
   "repository": {
@@ -25,10 +25,6 @@
     "build": "vite build",
     "prepublishOnly": "npm run build"
   },
-  "workspaces": [
-    ".",
-    "playground"
-  ],
   "peerDependencies": {
     "esbuild": "*"
   },
@@ -47,7 +43,7 @@
     "plugin",
     "src",
     "electron-env.d.ts",
-    "index.mjs",
+    "index.cjs",
     "index.js"
   ],
   "keywords": [
