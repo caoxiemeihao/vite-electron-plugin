@@ -20,6 +20,7 @@ npm i vite-electron-plugin -D
 ## Examples
 
 - [quick-start](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/quick-start)
+- [alias](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/alias)
 - [custom-start-electron-app](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/custom-start-electron-app)
 
 ## Recommend structure
@@ -96,7 +97,7 @@ You can freely modify the `config` argument in ths hooks or use.
 - **Type**: `(envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void`
 - **Kind**: `async`, `parallel`
 
-Triggered by `include` file changes. You can emit some files in this hooks. You can copy files here, or even restart the Electron App.
+Triggered by `include` file changes. You can emit some files in this hooks. Even restart the Electron App.
 
 #### `transform`
 
@@ -110,14 +111,14 @@ Triggered by changes in `extensions` files in include.
 - **Type**: `(args: { filename: string, distname: string }) => void`
 - **Kind**: `async`, `parallel`
 
-Triggered when `transform()` ends.
+Triggered when `transform()` ends or a file in `extensions` is removed.
 
 ## Builtin Plugin
 
 ```ts
 import electron from 'vite-electron-plugin'
 import {
-  alias, // TODO: 2022-09-29
+  alias,
   customStart,
 } from 'vite-electron-plugin/plugin'
 
@@ -157,8 +158,8 @@ export interface Configuration {
       code: string
       /** Skip subsequent transform hooks */
       done: () => void
-    }) => string | import('esbuild').TransformResult | void | Promise<string | import('esbuild').TransformResult | void>
-    /** Triggered when `transform()` ends */
+    }) => string | null | void | import('esbuild').TransformResult | Promise<string | null | void | import('esbuild').TransformResult>
+    /** Triggered when `transform()` ends or a file in `extensions` is removed */
     ondone?: (args: {
       /** Raw filename */
       filename: string
@@ -200,13 +201,13 @@ export interface ResolvedConfig {
   watcher: import('chokidar').FSWatcher | null
   /** The value is `null` at build time */
   viteDevServer: import('vite').ViteDevServer | null,
-  /** Unstable functions */
+  /** Internal functions (🚨 Experimental) */
   _fn: {
     /** Electron App startup function */
     startup: (args?: string[]) => void
     include2files: (config: ResolvedConfig, include?: string[]) => string[]
     include2globs: (config: ResolvedConfig, include?: string[]) => string[]
-    include2dist: (filename: string, replace2js?: boolean) => string
+    replace2dist: (filename: string, replace2js?: boolean) => string
   }
 }
 ```
