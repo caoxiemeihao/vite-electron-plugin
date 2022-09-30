@@ -126,10 +126,12 @@ export default {
   plugins: [
     electron({
       plugins: [
-        alias: {
+        alias([
           // Absolute path are recommended for alias, which will automatically calculate relative path
-          '@': path.join(__dirname, 'src'),
-        },
+          { find: '@', replacement: path.join(__dirname, 'src') },
+        ]),
+
+        // If you want to control the launch of Electron App yourself
         customStart(({ startup }) => {
           // Do something
         }),
