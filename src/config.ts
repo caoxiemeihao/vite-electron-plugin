@@ -95,12 +95,8 @@ export async function resolveConfig(
   const resolved: ResolvedConfig = {
     plugins: resolvePlugins(config),
     root: resolvedRoot,
-    include: include.map(p => path.isAbsolute(p)
-      ? normalizePath(p).replace(resolvedRoot + '/', '')
-      : normalizePath(p)),
-    outDir: path.isAbsolute(defaultOutDir)
-      ? defaultOutDir
-      : path.posix.join(resolvedRoot, defaultOutDir),
+    include: include.map(p => normalizePath(p).replace(resolvedRoot + '/', '')),
+    outDir: path.posix.resolve(resolvedRoot, defaultOutDir),
     transformOptions: Object.assign({
       target: 'node14',
       // At present, Electron(20) can only support CommonJs
@@ -150,7 +146,7 @@ export async function resolveConfig(
 
 function include2files(config: ResolvedConfig, include = config.include) {
   return fastGlob
-    .sync(include2globs(config, include))
+    .sync(include2globs(config, include), { cwd: config.root })
     .filter(p => config.extensions.includes(path.extname(p)))
     .map(file => normalizePath(file))
 }
