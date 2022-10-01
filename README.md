@@ -20,8 +20,9 @@ npm i vite-electron-plugin -D
 ## Examples
 
 - [quick-start](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/quick-start)
-- [alias](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/alias)
-- [custom-start-electron-app](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/custom-start-electron-app)
+- [plugin/alias](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/alias)
+- [plugin/copy](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/copy)
+- [plugin/custom-start-electron-app](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/custom-start-electron-app)
 
 ## Recommend structure
 
@@ -116,9 +117,11 @@ Triggered when `transform()` ends or a file in `extensions` is removed.
 ## Builtin Plugin
 
 ```ts
+import path from 'path'
 import electron from 'vite-electron-plugin'
 import {
   alias,
+  copy,
   customStart,
 } from 'vite-electron-plugin/plugin'
 
@@ -131,9 +134,14 @@ export default {
           { find: '@', replacement: path.join(__dirname, 'src') },
         ]),
 
-        // If you want to control the launch of Electron App yourself
+        copy([
+          // Support glob
+          { from: 'foo/*.ext', to: 'dest' },
+        ]),
+
         customStart(({ startup }) => {
-          // Do something
+          // If you want to control the launch of Electron App yourself
+          startup()
         }),
       ],
     }),
