@@ -1,6 +1,8 @@
+import fs from 'fs'
 import path from 'path'
-import type { ViteDevServer } from 'vite'
+import { type ViteDevServer, normalizePath } from 'vite'
 import type { Plugin, ResolvedConfig } from '..'
+import { colours, ensureDir } from '../src/utils'
 
 // TODO: use ast implement alias plugin
 export function alias(options: {
@@ -50,6 +52,51 @@ export function alias(options: {
       }
 
       return code === source ? null : code
+    },
+  }
+}
+
+export function copy(options: {
+  from: string
+  to: string
+}[]): Plugin {
+  const copyStream = (filename: string, destname: string) => fs
+    .createReadStream(filename)
+    .pipe(fs.createWriteStream(destname))
+    .on('error', error => console.log(colours.red(error.message)))
+
+  return {
+    name: 'plugin-copy',
+    configResolved(config) {
+      ; (async () => {
+        const { default: fastGlob } = await import('fast-glob')
+
+        for (const option of options) {
+          fastGlob(option.from, { cwd: config.root }).then(files => {
+            for (const filename of files) {
+
+              const relative = normalizePath(option.from).replace(config.root + '/', '')
+              // /root/foo/bar-*/* -> /foo
+              // /root/foo/**/*    -> /foo
+              // /root/*           -> 
+              let exact: string
+              if (relative.includes('*')) {
+                const paths = relative.split('/')
+                exact = paths.slice(0, paths.findIndex(p => p.includes('*'))).join('/')
+              } else {
+                exact = relative
+              }
+
+              const destname = path.posix.join(
+                path.posix.resolve(config.root, normalizePath(option.to)),
+                filename.replace(path.posix.join(config.root, exact), ''),
+              )
+              ensureDir(destname)
+              copyStream(filename, destname).on('finish', () => console.log(colours.green('[copy]'), destname))
+            }
+          })
+        }
+      })()
     },
   }
 }
