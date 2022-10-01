@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import type { ResolvedConfig } from './config'
 
 export function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
   let t: NodeJS.Timeout
@@ -20,6 +19,7 @@ export const colours = {
   cyan: (str: string) => colours.$_$(36)(str),
   yellow: (str: string) => colours.$_$(33)(str),
   red: (str: string) => colours.$_$(31)(str),
+  green: (str: string) => colours.$_$(32)(str),
 }
 
 export const JS_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx']
