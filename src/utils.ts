@@ -27,14 +27,35 @@ export const STATIC_JS_EXTENSIONS = ['.json', '.node', '.wasm']
 
 export function ensureDir(filename: string): string {
   const dir = path.dirname(filename)
-  !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true })
-
+  if (!ensureDir.cache.get(dir)) {
+    !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true })
+    ensureDir.cache.set(dir, true)
+  }
   return filename
 }
+ensureDir.cache = new Map<string, true>()
 
 export function jsType(filename: string) {
   return {
     js: !filename.endsWith('.d.ts') && JS_EXTENSIONS.some(ext => filename.endsWith(ext)),
     static: STATIC_JS_EXTENSIONS.some(ext => filename.endsWith(ext))
   }
+}
+
+function log(type: 'error' | 'info' | 'success' | 'warn', ...message: string[]) {
+  const dict: Record<Parameters<typeof log>[1], Exclude<keyof typeof colours, '$_$'>> = {
+    error: 'red',
+    info: 'cyan',
+    success: 'green',
+    warn: 'yellow',
+  }
+  message = message.map(msg => colours[dict[type]](msg))
+  console.log(...message)
+}
+export const logger: Record<Parameters<typeof log>[0] | 'log', (...message: string[]) => void> = {
+  error: (...message: string[]) => log('error', ...message),
+  info: (...message: string[]) => log('info', ...message),
+  success: (...message: string[]) => log('success', ...message),
+  warn: (...message: string[]) => log('warn', ...message),
+  log: (...message: string[]) => console.log(...message),
 }

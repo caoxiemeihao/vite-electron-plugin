@@ -1,3 +1,13 @@
+## 0.4.0 (2022-10-02)
+
+- 471f71b v0.4.0
+- 84ee5b3 fix(plugin): correct copy path
+- b4b03a9 chore: use `logger`
+- f43fbbb choer: ignore warning
+- c78f604 feat: support sourcemap
+- 599a6b7 feat: `logger`
+- 0ee1ec9 feat: ensureDir.cache
+
 ## 0.3.3 (2022-10-01)
 
 - 5d76ce1 v0.3.3
