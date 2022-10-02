@@ -41,3 +41,20 @@ export function jsType(filename: string) {
     static: STATIC_JS_EXTENSIONS.some(ext => filename.endsWith(ext))
   }
 }
+
+function log(message: string, type: 'error' | 'info' | 'success' | 'warn') {
+  const dict: Record<Parameters<typeof log>[1], Exclude<keyof typeof colours, '$_$'>> = {
+    error: 'red',
+    info: 'cyan',
+    success: 'green',
+    warn: 'yellow',
+  }
+  message = colours[dict[type]](message)
+  console.log(message)
+}
+export const logger: Record<Parameters<typeof log>[1], (message: string) => void> = {
+  error: (message: string) => log(message, 'error'),
+  info: (message: string) => log(message, 'info'),
+  success: (message: string) => log(message, 'success'),
+  warn: (message: string) => log(message, 'warn'),
+}
