@@ -1,14 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import { type ResolvedConfig } from './config'
-import { colours, ensureDir } from './utils'
+import { colours, logger, ensureDir } from './utils'
 
 export async function build(config: ResolvedConfig, filename: string) {
   const { _fn, plugins } = config
   const distname = _fn.replace2dist(filename, true)
 
   if (distname === filename) {
-    console.log(
+    logger.log(
       colours.yellow('Input and output are the same file\n '),
       filename, '->', distname,
     )
@@ -30,7 +30,7 @@ export async function build(config: ResolvedConfig, filename: string) {
         code = result
       } else if (result !== null && typeof result === 'object') {
         if (result.warnings.length) {
-          console.log(colours.yellow(result.warnings.map(e => e.text).join('\n')))
+          logger.warn(result.warnings.map(e => e.text).join('\n'))
         }
         code = result.code
         if (result.map) {
@@ -45,6 +45,6 @@ export async function build(config: ResolvedConfig, filename: string) {
     }
 
     fs.writeFileSync(distname, code)
-    console.log(colours.cyan(`[${new Date().toLocaleTimeString()}]`), distname)
+    logger.log(colours.cyan(`[${new Date().toLocaleTimeString()}]`), distname)
   }
 }

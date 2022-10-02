@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { type ViteDevServer, normalizePath } from 'vite'
 import type { Plugin, ResolvedConfig } from '..'
-import { colours, ensureDir } from '../src/utils'
+import { colours, ensureDir, logger } from '../src/utils'
 
 // TODO: use ast implement alias plugin
 export function alias(options: {
@@ -63,7 +63,7 @@ export function copy(options: {
   const copyStream = (filename: string, destname: string) => fs
     .createReadStream(filename)
     .pipe(fs.createWriteStream(destname))
-    .on('error', error => console.log(colours.red(error.message)))
+    .on('error', error => logger.error(error.message))
 
   return {
     name: 'plugin-copy',
@@ -92,7 +92,7 @@ export function copy(options: {
                 filename.replace(path.posix.join(config.root, exact), ''),
               )
               ensureDir(destname)
-              copyStream(filename, destname).on('finish', () => console.log(colours.green('[copy]'), destname))
+              copyStream(filename, destname).on('finish', () => logger.log(colours.green('[copy]'), destname))
             }
           })
         }
