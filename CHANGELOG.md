@@ -1,3 +1,10 @@
+## 0.4.1 (2022-10-03)
+
+- 4e43983 v0.4.1
+- 736c66d chore: log info
+- 1c5668d chore(utils): add `colours.gary`
+- b3712ae fix(plugin): API incorrect
+
 ## 0.4.0 (2022-10-02)
 
 - 471f71b v0.4.0
