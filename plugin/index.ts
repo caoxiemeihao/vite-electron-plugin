@@ -115,7 +115,7 @@ export function customStart(callback?: (args?: {
     configResolved(_config) {
       config = _config
       // Remove internal startup function
-      config.plugins.slice(_config.plugins.findIndex(plugin => plugin.name === ':startup'), 1)
+      config.plugins.splice(_config.plugins.findIndex(plugin => plugin.name === ':startup'), 1)
     },
     ondone({ filename }) {
       if (config?.command === 'serve' && callback) {
