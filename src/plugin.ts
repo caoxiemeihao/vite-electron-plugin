@@ -5,7 +5,11 @@ import {
   type ResolvedConfig,
   type Plugin,
 } from './config'
-import { debounce } from './utils'
+import {
+  colours,
+  debounce,
+  logger,
+} from './utils'
 
 export function resolvePlugins(config: Configuration): Plugin[] {
 
@@ -58,6 +62,7 @@ function startup(): Plugin {
             viteDevServer!.ws.send({ type: 'full-reload' })
           } else {
             _fn.startup()
+            logger.log(colours.green('[startup]'), 'Electron App')
           }
         })
       }

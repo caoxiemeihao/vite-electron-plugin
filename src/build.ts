@@ -45,6 +45,10 @@ export async function build(config: ResolvedConfig, filename: string) {
     }
 
     fs.writeFileSync(distname, code)
-    logger.log(colours.cyan(`[${new Date().toLocaleTimeString()}]`), distname)
+    logger.log(
+      colours.cyan('[write]'),
+      colours.gary(new Date().toLocaleTimeString()),
+      `${distname}`,
+    )
   }
 }
