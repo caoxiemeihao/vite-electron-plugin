@@ -1,3 +1,10 @@
+## 0.4.2 (2022-10-04)
+
+- 2a34af1 v0.4.2
+- 32bf379 (main) chore: rename
+- bcf26f2 chore(🤔): remove `ensureDir.cache`
+- 5af7dc1 fix(examples): correct reference types path
+
 ## 0.4.1 (2022-10-03)
 
 - 4e43983 v0.4.1
