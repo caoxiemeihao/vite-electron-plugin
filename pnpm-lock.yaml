@@ -24,30 +24,36 @@ importers:
   examples/alias:
     specifiers:
       electron: ^20.2.0
+      typescript: ^4.8.3
       vite: ^3.1.3
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 20.2.0
+      typescript: 4.8.3
       vite: 3.1.3
       vite-electron-plugin: link:../..
 
   examples/copy:
     specifiers:
       electron: ^20.2.0
+      typescript: ^4.8.3
       vite: ^3.1.3
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 20.2.0
+      typescript: 4.8.3
       vite: 3.1.3
       vite-electron-plugin: link:../..
 
   examples/custom-start-electron-app:
     specifiers:
       electron: ^20.2.0
+      typescript: ^4.8.3
       vite: ^3.1.3
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 20.2.0
+      typescript: 4.8.3
       vite: 3.1.3
       vite-electron-plugin: link:../..
 
@@ -55,11 +61,13 @@ importers:
     specifiers:
       electron: ^20.2.0
       electron-builder: ^23.3.3
+      typescript: ^4.8.3
       vite: ^3.1.3
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 20.2.0
       electron-builder: 23.3.3
+      typescript: 4.8.3
       vite: 3.1.3
       vite-electron-plugin: link:../..
 
