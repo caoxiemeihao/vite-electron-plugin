@@ -28,13 +28,9 @@ export const STATIC_JS_EXTENSIONS = ['.json', '.node', '.wasm']
 
 export function ensureDir(filename: string): string {
   const dir = path.dirname(filename)
-  if (!ensureDir.cache.get(dir)) {
-    !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true })
-    ensureDir.cache.set(dir, true)
-  }
+  !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true })
   return filename
 }
-ensureDir.cache = new Map<string, true>()
 
 export function jsType(filename: string) {
   return {
