@@ -43,7 +43,7 @@ export default mergeConfig(config, {
     lib: {
       entry: 'src/index.ts',
       formats: ['cjs', 'es'],
-      fileName: format => format === 'cjs' ? '[name].cjs' : '[name].js',
+      fileName: format => format === 'es' ? '[name].mjs' : '[name].js',
     },
   },
 } as UserConfig)
@@ -58,7 +58,7 @@ function buildPlugin(watch: Required<BuildOptions>['watch']) {
       lib: {
         entry: 'plugin/index.ts',
         formats: ['cjs', 'es'],
-        fileName: format => format === 'cjs' ? '[name].cjs' : '[name].js',
+        fileName: format => format === 'es' ? '[name].mjs' : '[name].js',
       },
     },
   } as InlineConfig))

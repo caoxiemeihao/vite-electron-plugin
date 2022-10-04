@@ -111,6 +111,6 @@ package-lock.json
 yarn.lock
 
 /index.js
-/index.cjs
+/index.mjs
 /plugin/index.js
-/plugin/index.cjs
+/plugin/index.mjs
