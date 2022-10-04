@@ -25,10 +25,10 @@ export function alias(options: {
       }[] = []
 
       while (match = requireRE.exec(source)) {
-        const [, id] = match
+        const [, rawId] = match
         const start = match.index + startOffset
-        const end = start + id.length
-        nodes.unshift({ start, end, raw: id })
+        const end = start + rawId.length
+        nodes.unshift({ start, end, raw: rawId })
       }
 
       if (!nodes.length) {
