@@ -23,44 +23,52 @@ importers:
 
   examples/alias:
     specifiers:
-      electron: ^20.2.0
-      vite: ^3.1.3
+      electron: ^21.0.1
+      typescript: ^4.8.3
+      vite: ^3.1.4
       vite-electron-plugin: workspace:*
     devDependencies:
-      electron: 20.2.0
-      vite: 3.1.3
+      electron: 21.0.1
+      typescript: 4.8.3
+      vite: 3.1.4
       vite-electron-plugin: link:../..
 
   examples/copy:
     specifiers:
-      electron: ^20.2.0
-      vite: ^3.1.3
+      electron: ^21.0.1
+      typescript: ^4.8.3
+      vite: ^3.1.4
       vite-electron-plugin: workspace:*
     devDependencies:
-      electron: 20.2.0
-      vite: 3.1.3
+      electron: 21.0.1
+      typescript: 4.8.3
+      vite: 3.1.4
       vite-electron-plugin: link:../..
 
   examples/custom-start-electron-app:
     specifiers:
-      electron: ^20.2.0
-      vite: ^3.1.3
+      electron: ^21.0.1
+      typescript: ^4.8.3
+      vite: ^3.1.4
       vite-electron-plugin: workspace:*
     devDependencies:
-      electron: 20.2.0
-      vite: 3.1.3
+      electron: 21.0.1
+      typescript: 4.8.3
+      vite: 3.1.4
       vite-electron-plugin: link:../..
 
   examples/quick-start:
     specifiers:
-      electron: ^20.2.0
+      electron: ^21.0.1
       electron-builder: ^23.3.3
-      vite: ^3.1.3
+      typescript: ^4.8.3
+      vite: ^3.1.4
       vite-electron-plugin: workspace:*
     devDependencies:
-      electron: 20.2.0
+      electron: 21.0.1
       electron-builder: 23.3.3
-      vite: 3.1.3
+      typescript: 4.8.3
+      vite: 3.1.4
       vite-electron-plugin: link:../..
 
 packages:
@@ -891,8 +899,8 @@ packages:
       - supports-color
     dev: true
 
-  /electron/20.2.0:
-    resolution: {integrity: sha512-qw92PfXaC+fGoqJfQ2U5tVF8ux5HyVwgt1AxAtx6uz+dYcgtPBvfBN1jb+uzZVR+QVd+wCJ8Sqt6TD1ctwTauw==}
+  /electron/21.0.1:
+    resolution: {integrity: sha512-jLVSLakd0fO2GPnW4xXQrI93R464jeFb2ISngqRP3wpwH96XqeANkuAYLAr9TVhfQMCIWnuPROBZ+NU7nuk0WA==}
     engines: {node: '>= 10.17.0'}
     hasBin: true
     requiresBuild: true
@@ -2342,6 +2350,33 @@ packages:
 
   /vite/3.1.3:
     resolution: {integrity: sha512-/3XWiktaopByM5bd8dqvHxRt5EEgRikevnnrpND0gRfNkrMrPaGGexhtLCzv15RcCMtV2CLw+BPas8YFeSG0KA==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.15.9
+      postcss: 8.4.16
+      resolve: 1.22.1
+      rollup: 2.78.1
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
+  /vite/3.1.4:
+    resolution: {integrity: sha512-JoQI08aBjY9lycL7jcEq4p9o1xUjq5aRvdH4KWaXtkSx7e7RpAh9D3IjzDWRD4Fg44LS3oDAIOG/Kq1L+82psA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:

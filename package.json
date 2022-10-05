@@ -1,17 +1,17 @@
 {
   "name": "vite-electron-plugin",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Fast, Electron plugin for Vite",
-  "main": "index.js",
+  "main": "index.mjs",
   "types": "src",
   "exports": {
     ".": {
-      "import": "./index.js",
-      "require": "./index.cjs"
+      "import": "./index.mjs",
+      "require": "./index.js"
     },
     "./plugin": {
-      "import": "./plugin/index.js",
-      "require": "./plugin/index.cjs"
+      "import": "./plugin/index.mjs",
+      "require": "./plugin/index.js"
     }
   },
   "repository": {
@@ -43,7 +43,7 @@
     "plugin",
     "src",
     "electron-env.d.ts",
-    "index.cjs",
+    "index.mjs",
     "index.js"
   ],
   "keywords": [
