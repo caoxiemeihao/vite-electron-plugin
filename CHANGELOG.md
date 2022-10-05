@@ -1,3 +1,10 @@
+## 0.4.3 (2022-10-05)
+
+- 895d4e6 v0.4.3
+- ae21cd9 fix(#10): `index.js` -> `index.mjs`, `index.cjs` -> `index.js`
+- dc41b53 chore(examples): bump dependencies
+- 5fd7797 chore(examples): add typescript
+
 ## 0.4.2 (2022-10-04)
 
 - 2a34af1 v0.4.2
