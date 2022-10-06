@@ -89,12 +89,13 @@ export function copy(options: {
                 copyRoot = option.from
               }
 
-              const destname = path.posix.join(
-                path.posix.resolve(config.root, option.to),
-                filename.replace(copyRoot, ''),
-              )
+              option.to = path.isAbsolute(option.to) ? option.to : path.posix.join(config.root, option.to)
+              const destname = path.posix.join(option.to, filename.replace(copyRoot, ''))
+
               ensureDir(destname)
-              copyStream(filename, destname).on('finish', () => logger.log(colours.green('[copy]'), destname))
+              copyStream(filename, destname).on('finish', () =>
+                logger.log(colours.green('[plugin/copy]'), destname),
+              )
             }
           })
         }
