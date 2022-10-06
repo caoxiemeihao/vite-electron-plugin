@@ -82,7 +82,7 @@ export async function resolveConfig(
   const {
     root,
     include,
-    outDir,
+    outDir = 'dist-electron',
     transformOptions,
   } = config
   // https://github.com/vitejs/vite/blob/9a83eaffac3383f5ee68097807de532f0b5cb25c/packages/vite/src/node/config.ts#L456-L459
@@ -90,13 +90,12 @@ export async function resolveConfig(
   const resolvedRoot = normalizePath(
     root ? path.resolve(root) : process.cwd()
   )
-  const defaultOutDir = normalizePath(outDir ?? 'dist-electron')
 
   const resolved: ResolvedConfig = {
     plugins: resolvePlugins(config),
     root: resolvedRoot,
     include: include.map(p => normalizePath(p).replace(resolvedRoot + '/', '')),
-    outDir: path.posix.resolve(resolvedRoot, defaultOutDir),
+    outDir: normalizePath(path.isAbsolute(outDir) ? outDir : path.join(resolvedRoot, outDir)),
     transformOptions: Object.assign({
       target: 'node14',
       // At present, Electron(20) can only support CommonJs
