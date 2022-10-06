@@ -96,7 +96,7 @@ export async function resolveConfig(
     plugins: resolvePlugins(config),
     root: resolvedRoot,
     include: include.map(p => normalizePath(p).replace(resolvedRoot + '/', '')),
-    outDir: path.posix.resolve(resolvedRoot, defaultOutDir),
+    outDir: path.posix.join(resolvedRoot, defaultOutDir),
     transformOptions: Object.assign({
       target: 'node14',
       // At present, Electron(20) can only support CommonJs
