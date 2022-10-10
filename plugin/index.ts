@@ -106,8 +106,10 @@ export function copy(options: {
 
 export function customStart(callback?: (args?: {
   startup: ResolvedConfig['_fn']['startup']
+  reload: ResolvedConfig['_fn']['reload']
   filename: string
-  viteDevServer: ViteDevServer
+  // arguments should be side-effect free
+  // viteDevServer: ViteDevServer
 }) => void): Plugin {
   let config: ResolvedConfig
 
@@ -120,7 +122,11 @@ export function customStart(callback?: (args?: {
     },
     ondone({ filename }) {
       if (config?.command === 'serve' && callback) {
-        callback({ startup: config._fn.startup, filename, viteDevServer: config.viteDevServer! })
+        callback({
+          startup: config._fn.startup,
+          reload: config._fn.reload,
+          filename,
+        })
       }
     },
   }

@@ -46,20 +46,19 @@ function startup(): Plugin {
   return {
     name: ':startup',
     configResolved(_config) {
-      const { command, viteDevServer, _fn } = config = _config
+      const { command, _fn } = config = _config
       if (command === 'serve') {
         startup = debounce(function startup_fn() {
           /**
-           * Preload-Scripts
            * e.g.
-           * - `xxx.preload.js`
-           * - `xxx.preload.ts`
+           * - `foo.reload.js`
+           * - `preload.ts`
            */
-          const ispreload = config.extensions.some(ext => files.every(file => file.endsWith('preload' + ext)))
+          const reload = config.extensions.some(ext => files.every(file => file.endsWith('reload' + ext)))
           files.length = 0
 
-          if (ispreload) {
-            viteDevServer!.ws.send({ type: 'full-reload' })
+          if (reload) {
+            _fn.reload()
           } else {
             _fn.startup()
             logger.log(colours.green('[startup]'), 'Electron App')

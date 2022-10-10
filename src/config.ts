@@ -31,7 +31,7 @@ export interface Configuration {
   }[],
   /** @default process.cwd() */
   root?: string
-  /** Electron-Main, Preload-Scripts */
+  /** Electron-Main, Preload-Scripts, same behavior as tsc 🌱 */
   include: string[]
   /** @default 'dist-electron' */
   outDir?: string
@@ -63,6 +63,8 @@ export interface ResolvedConfig {
   _fn: {
     /** Electron App startup function */
     startup: (args?: string[]) => void
+    /** Reload Electron-Renderer */
+    reload: () => void
     include2files: (config: ResolvedConfig, include?: string[]) => string[]
     include2globs: (config: ResolvedConfig, include?: string[]) => string[]
     replace2dist: (filename: string, replace2js?: boolean) => string
@@ -122,6 +124,9 @@ export async function resolveConfig(
         process.electronApp = spawn(electronPath, args, { stdio: 'inherit' })
         // Exit command after Electron.app exits
         process.electronApp.once('exit', process.exit)
+      },
+      reload() {
+        viteDevServer?.ws.send({ type: 'full-reload' })
       },
       include2files,
       include2globs,
