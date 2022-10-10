@@ -1,6 +1,6 @@
 {
   "name": "vite-electron-plugin",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Fast, Electron plugin for Vite",
   "main": "index.mjs",
   "types": "src",
