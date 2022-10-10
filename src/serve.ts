@@ -19,7 +19,7 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
   // There can't be any await statement here, it will cause `watcher.on` to miss the first trigger.
   watcher!.on('all', async (event, _filepath) => {
     const filepath = normalizePath(_filepath)
-    const distpath = _fn.replace2dist(filepath, true)
+    const destpath = _fn.replace2dest(filepath, true)
     const js_type = jsType(filepath)
     let run_done = false
 
@@ -35,23 +35,23 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
           await build(resolved, filepath)
         } else if (js_type.static) {
           // static files
-          fs.copyFileSync(filepath, ensureDir(distpath))
+          fs.copyFileSync(filepath, ensureDir(destpath))
         }
 
         run_done = js_type.js || js_type.static
         break
       }
       case 'addDir':
-        // !fs.existsSync(distpath) && fs.mkdirSync(distpath, { recursive: true })
+        // !fs.existsSync(destpath) && fs.mkdirSync(destpath, { recursive: true })
         break
       case 'unlink':
-        if (fs.existsSync(distpath)) {
-          fs.unlinkSync(distpath)
+        if (fs.existsSync(destpath)) {
+          fs.unlinkSync(destpath)
           run_done = js_type.js || js_type.static
         }
         break
       case 'unlinkDir':
-        fs.existsSync(distpath) && fs.rmSync(distpath, { recursive: true, force: true })
+        fs.existsSync(destpath) && fs.rmSync(destpath, { recursive: true, force: true })
         break
     }
 
@@ -59,7 +59,7 @@ export async function bootstrap(config: Configuration, server: ViteDevServer) {
       run_done = false
       for (const plugin of plugins) {
         // call ondone hooks
-        plugin.ondone?.({ filename: filepath, distname: distpath })
+        plugin.ondone?.({ filename: filepath, destname: destpath })
       }
     }
   })
