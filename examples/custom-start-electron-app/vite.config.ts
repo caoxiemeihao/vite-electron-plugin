@@ -13,8 +13,11 @@ export default defineConfig({
     ],
     plugins: [
       customStart(debounce(args => {
-        if (['.ts', '.js'].some(ext => args.filename.endsWith('preload' + ext))) {
-          args.viteDevServer.ws.send({ type: 'full-reload' })
+        if (['.ts', '.js'].some(ext => args.filename.endsWith('reload' + ext))) {
+          // Any file ending with `reload.ext` *(e.g. `foo.reload.js`, `preload.ts`)* after an update, 
+          // will trigger a reload of the Electron-Renderer process, instead of an entire Electron App restart. 
+          // Which is useful when updating Preload-Scripts.
+          args.reload()
         } else {
           // This callback function will be called when the "js" files in the include changes
           // Equivalent to - `electron . --no-sandbox` (make sure the "main" field in package.json is correct)
