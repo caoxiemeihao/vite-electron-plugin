@@ -1,8 +1,4 @@
 import fs from 'fs'
-import {
-  type UserConfig,
-  type Plugin as VitePlugin,
-} from 'vite'
 import { bootstrap } from './serve'
 import { build } from './build'
 import {
@@ -27,7 +23,7 @@ function defineConfig(config: Configuration) {
   return config
 }
 
-function electron(config: Configuration): VitePlugin[] {
+function electron(config: Configuration): import('vite').Plugin[] {
   return [
     {
       name: `${name}:serve`,
@@ -39,52 +35,31 @@ function electron(config: Configuration): VitePlugin[] {
     {
       name: `${name}:build`,
       apply: 'build',
-      config(_config) {
-        electronConfigPreset(_config)
+      config(config) {
+        // Make sure that Electron App can be loaded into the local file using `loadFile` after build
+        config.base ??= './'
       },
       async closeBundle() {
         const resolved = await resolveConfig(config, 'build')
         const { _fn, plugins } = resolved
         for (const filename of _fn.include2files(resolved)) {
           const js_type = jsType(filename)
-          const distname = _fn.replace2dist(filename, true)
+          const destname = _fn.replace2dest(filename, true)
           if (js_type.js) {
             await build(resolved, filename)
           } else if (js_type.static) {
             // static files
-            fs.copyFileSync(filename, ensureDir(distname))
+            fs.copyFileSync(filename, ensureDir(destname))
           }
 
           if (js_type.js || js_type.static) {
             for (const plugin of plugins) {
               // call ondone hooks
-              plugin.ondone?.({ filename, distname })
+              plugin.ondone?.({ filename, destname })
             }
           }
         }
       },
     },
   ]
-}
-
-function electronConfigPreset(config: UserConfig) {
-  // make sure that Electron can be loaded into the local file using `loadFile` after packaging
-  config.base ??= './'
-
-  config.build ??= {}
-
-  // TODO: init `config.build.target`
-  // https://github.com/vitejs/vite/pull/8843
-
-  // ensure that static resources are loaded normally
-  // TODO: Automatic splicing `build.assetsDir`
-  config.build.assetsDir ??= ''
-
-  // https://github.com/electron-vite/electron-vite-vue/issues/107
-  config.build.cssCodeSplit ??= false
-
-  // prevent accidental clearing of `dist/electron/main`, `dist/electron/preload`
-  config.build.emptyOutDir ??= false
-
-  return config
 }

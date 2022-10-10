@@ -1,3 +1,12 @@
+## 0.4.5 (2022-10-10)
+
+- 030906f v0.4.5
+- 07714bc docs: v0.4.5
+- 2e24e98 chore(examples): update usage case
+- a54f44a chore: bump vite to 3.2.0-beta.0
+- 774d226 chore: cleanup
+- 909116b feat: `reload()` 🌱
+
 ## 0.4.4 (2022-10-06)
 
 - 6ba1147 v0.4.4

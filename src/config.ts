@@ -23,15 +23,13 @@ export interface Configuration {
     }) => string | null | void | import('esbuild').TransformResult | Promise<string | null | void | import('esbuild').TransformResult>
     /** Triggered when `transform()` ends or a file in `extensions` is removed */
     ondone?: (args: {
-      /** Raw filename */
       filename: string
-      /** Dist filename */
-      distname: string
+      destname: string
     }) => void
   }[],
   /** @default process.cwd() */
   root?: string
-  /** Electron-Main, Preload-Scripts */
+  /** Electron-Main, Preload-Scripts, same behavior as tsc 🌱 */
   include: string[]
   /** @default 'dist-electron' */
   outDir?: string
@@ -63,9 +61,11 @@ export interface ResolvedConfig {
   _fn: {
     /** Electron App startup function */
     startup: (args?: string[]) => void
+    /** Reload Electron-Renderer */
+    reload: () => void
     include2files: (config: ResolvedConfig, include?: string[]) => string[]
     include2globs: (config: ResolvedConfig, include?: string[]) => string[]
-    replace2dist: (filename: string, replace2js?: boolean) => string
+    replace2dest: (filename: string, replace2js?: boolean) => string
   }
 }
 
@@ -123,9 +123,12 @@ export async function resolveConfig(
         // Exit command after Electron.app exits
         process.electronApp.once('exit', process.exit)
       },
+      reload() {
+        viteDevServer?.ws.send({ type: 'full-reload' })
+      },
       include2files,
       include2globs,
-      replace2dist: (filename: string, replace2js?: boolean) => input2output(resolved, filename, replace2js),
+      replace2dest: (filename: string, replace2js?: boolean) => input2output(resolved, filename, replace2js),
     },
   }
 
@@ -174,9 +177,10 @@ function input2output(
 
   const { root, outDir } = config
   if (input2output.reduce1level === false) {
-    // This behavior is more like tsc
-    //
-    // electron -> dist-electron
+    // This behavior is the same as tsc
+
+    // e.g.
+    // - include(['electron']) -> dist-electron
     //
     // ├─┬ electron
     // │ ├─┬ main.ts
@@ -187,8 +191,9 @@ function input2output(
     // │ ├─┬ main.js
     // │ │ └── index.js
     // │ └── preload.js
-    //
-    // electron -> dist-electron/electron
+
+    // e.g.
+    // - include(['electron', 'preload.ts]) -> dist-electron/electron
     //
     // ├─┬ electron
     // │ └─┬ main.ts
@@ -205,14 +210,14 @@ function input2output(
       .every(file => file.includes('/'))
   }
   const file = filename.replace(root + '/', '')
-  const distname = path.posix.join(
+  const destname = path.posix.join(
     outDir,
     input2output.reduce1level
       // src/main.js -> main.js
       ? file.slice(file.indexOf('/') + 1)
       : file
   )
-  const extname = path.extname(distname)
-  return (replace2js && config.extensions.includes(extname)) ? distname.replace(extname, '.js') : distname
+  const extname = path.extname(destname)
+  return (replace2js && config.extensions.includes(extname)) ? destname.replace(extname, '.js') : destname
 }
 input2output.reduce1level = false

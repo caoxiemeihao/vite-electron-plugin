@@ -5,15 +5,15 @@ import { colours, logger, ensureDir } from './utils'
 
 export async function build(config: ResolvedConfig, filename: string) {
   const { _fn, plugins } = config
-  const distname = _fn.replace2dist(filename, true)
+  const destname = _fn.replace2dest(filename, true)
 
-  if (distname === filename) {
+  if (destname === filename) {
     logger.log(
       colours.yellow('Input and output are the same file\n '),
-      filename, '->', distname,
+      filename, '->', destname,
     )
   } else {
-    ensureDir(distname)
+    ensureDir(destname)
 
     let code = fs.readFileSync(filename, 'utf8')
     let done = false
@@ -35,20 +35,20 @@ export async function build(config: ResolvedConfig, filename: string) {
         code = result.code
         if (result.map) {
           const map = JSON.parse(result.map)
-          const parsed = path.parse(distname)
+          const parsed = path.parse(destname)
           map.file = parsed.base
           map.sources = [path.relative(parsed.dir, filename)]
-          fs.writeFileSync(distname + '.map', JSON.stringify(map))
-          code += `\n//# sourceMappingURL=${path.basename(distname)}.map`
+          fs.writeFileSync(destname + '.map', JSON.stringify(map))
+          code += `\n//# sourceMappingURL=${path.basename(destname)}.map`
         }
       }
     }
 
-    fs.writeFileSync(distname, code)
+    fs.writeFileSync(destname, code)
     logger.log(
       colours.cyan('[write]'),
       colours.gary(new Date().toLocaleTimeString()),
-      `${distname}`,
+      `${destname}`,
     )
   }
 }
