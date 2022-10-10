@@ -43,7 +43,9 @@ Let's use the official [template-vanilla-ts](https://github.com/vitejs/vite/tree
 + └── vite.config.ts
 ```
 
-- 🚨 Any files ending with `preload.ext` are considered Preload-Scripts(**e.g.** `preload.ts`, `foo.preload.js`), and when they change, they will trigger the Electron-Renderer process to reload instead of restarting the entire Electron App.
+- 🚨 Any file ending with `reload.ext` *(e.g. `foo.reload.js`, `preload.ts`)* after an update, 
+  will trigger a reload of the Electron-Renderer process, instead of an entire Electron App restart. 
+  **Which is useful when updating Preload-Scripts.**
 - 🚨 By default, the files in `electron` folder will be built into the `dist-electron`
 - 🚨 Currently, `"type": "module"` is not supported in Electron
 
@@ -130,17 +132,18 @@ export default {
     electron({
       plugins: [
         alias([
-          // Absolute path are recommended for alias, which will automatically calculate relative path
+          // `replacement` is recommented to use absolute path, 
+          // it will be automatically calculated as relative path.
           { find: '@', replacement: path.join(__dirname, 'src') },
         ]),
 
         copy([
-          // Support glob
+          // filename, glob
           { from: 'foo/*.ext', to: 'dest' },
         ]),
 
         customStart(({ startup }) => {
-          // If you want to control the launch of Electron App yourself
+          // If you want to control the launch of Electron App yourself.
           startup()
         }),
       ],
@@ -171,15 +174,13 @@ export interface Configuration {
     }) => string | null | void | import('esbuild').TransformResult | Promise<string | null | void | import('esbuild').TransformResult>
     /** Triggered when `transform()` ends or a file in `extensions` is removed */
     ondone?: (args: {
-      /** Raw filename */
       filename: string
-      /** Dist filename */
-      distname: string
+      destname: string
     }) => void
   }[],
   /** @default process.cwd() */
   root?: string
-  /** Electron-Main, Preload-Scripts */
+  /** Electron-Main, Preload-Scripts, same behavior as tsc 🌱 */
   include: string[]
   /** @default 'dist-electron' */
   outDir?: string
@@ -215,9 +216,11 @@ export interface ResolvedConfig {
   _fn: {
     /** Electron App startup function */
     startup: (args?: string[]) => void
+    /** Reload Electron-Renderer */
+    reload: () => void
     include2files: (config: ResolvedConfig, include?: string[]) => string[]
     include2globs: (config: ResolvedConfig, include?: string[]) => string[]
-    replace2dist: (filename: string, replace2js?: boolean) => string
+    replace2dest: (filename: string, replace2js?: boolean) => string
   }
 }
 ```
