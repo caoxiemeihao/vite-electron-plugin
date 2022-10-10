@@ -176,11 +176,11 @@ function input2output(
   filename = normalizePath(filename)
 
   const { root, outDir } = config
-  if (input2output.reduce1level === false) {
+  /* if (input2output.reduce1level === false) {
     // This behavior is the same as tsc
 
     // e.g.
-    // - include(['electron']) -> dist-electron
+    // single - include(['electron']) -> dist-electron
     //
     // ├─┬ electron
     // │ ├─┬ main.ts
@@ -193,7 +193,7 @@ function input2output(
     // │ └── preload.js
 
     // e.g.
-    // - include(['electron', 'preload.ts]) -> dist-electron/electron
+    // multiple - include(['electron', 'preload.ts]) -> dist-electron/electron
     //
     // ├─┬ electron
     // │ └─┬ main.ts
@@ -208,16 +208,23 @@ function input2output(
     input2output.reduce1level = include2files(config)
       .map(file => file.replace(root + '/', ''))
       .every(file => file.includes('/'))
-  }
+  } */
+
   const file = filename.replace(root + '/', '')
   const destname = path.posix.join(
     outDir,
-    input2output.reduce1level
-      // src/main.js -> main.js
+    config.include.length === 1
+      // If include contains only one item, it will remove 1 level of dir
+      //
+      // e.g. - include(['electron'])
+      //   electron/main.ts -> dist-electron/main.js
+      //
+      // e.g. - include(['electron', 'preload.ts])
+      //   electron/main.ts -> dist-electron/electron/main.js
+      //   preload.ts       -> dist-electron/preload.js
       ? file.slice(file.indexOf('/') + 1)
       : file
   )
   const extname = path.extname(destname)
   return (replace2js && config.extensions.includes(extname)) ? destname.replace(extname, '.js') : destname
 }
-input2output.reduce1level = false
