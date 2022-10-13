@@ -29,7 +29,7 @@ export interface Configuration {
   }[],
   /** @default process.cwd() */
   root?: string
-  /** Electron-Main, Preload-Scripts, same behavior as tsc 🌱 */
+  /** directory, filename, glob */
   include: string[]
   /** @default 'dist-electron' */
   outDir?: string
