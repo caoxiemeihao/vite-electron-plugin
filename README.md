@@ -42,12 +42,11 @@ Let's use the official [template-vanilla-ts](https://github.com/vitejs/vite/tree
   ├── tsconfig.json
 + └── vite.config.ts
 ```
+## Conventions
 
-- 🚨 Any file ending with `reload.ext` *(e.g. `foo.reload.js`, `preload.ts`)* after an update, 
-  will trigger a reload of the Electron-Renderer process, instead of an entire Electron App restart. 
+- Any file ending with `reload.ext` *(e.g. `foo.reload.js`, `preload.ts`)* after an update,  
+  will trigger a reload of the Electron-Renderer process, instead of an entire Electron App restart.  
   **Which is useful when updating Preload-Scripts.**
-- 🚨 By default, the files in `electron` folder will be built into the `dist-electron`
-- 🚨 Currently, `"type": "module"` is not supported in Electron
 
 ## Usage
 
@@ -180,7 +179,7 @@ export interface Configuration {
   }[],
   /** @default process.cwd() */
   root?: string
-  /** Electron-Main, Preload-Scripts, same behavior as tsc 🌱 */
+  /** directory, filename, glob */
   include: string[]
   /** @default 'dist-electron' */
   outDir?: string
