@@ -76,6 +76,7 @@ export async function resolveConfig(
   command: ResolvedConfig['command'],
   viteDevServer: ViteDevServer | null = null
 ): Promise<ResolvedConfig> {
+  // @ts-ignore
   // Vite hot reload vite.config.js
   process._resolved_config?.watcher?.close()
 
@@ -141,6 +142,7 @@ export async function resolveConfig(
     await plugin.configResolved?.(resolved)
   }
 
+  // @ts-ignore
   return process._resolved_config = resolved
 }
 
@@ -150,18 +152,17 @@ function include2files(config: ResolvedConfig, include = config.include) {
   return fastGlob
     .sync(include2globs(config, include), { cwd: config.root })
     .filter(p => config.extensions.includes(path.extname(p)))
-    .map(file => normalizePath(file))
 }
 
 function include2globs(config: ResolvedConfig, files = config.include) {
   const { root } = config
   return files
-    .map(p => path.posix.join(root, p))
+    .map(p => path.join(root, p))
     .map(p => {
       try {
         const stat = fs.statSync(p)
         if (stat.isDirectory()) {
-          return path.posix.join(p, '**/*')
+          return path.join(p, '**/*')
         }
       } catch { }
       return p
@@ -173,8 +174,6 @@ function input2output(
   filename: string,
   replace2js = false,
 ) {
-  filename = normalizePath(filename)
-
   const { root, outDir } = config
   /* if (input2output.reduce1level === false) {
     // This behavior is the same as tsc
@@ -210,8 +209,8 @@ function input2output(
       .every(file => file.includes('/'))
   } */
 
-  const file = filename.replace(root + '/', '')
-  const destname = path.posix.join(
+  const file = normalizePath(filename).replace(root + '/', '')
+  const destname = path.join(
     outDir,
     config.include.length === 1
       // If include contains only one item, it will remove 1 level of dir

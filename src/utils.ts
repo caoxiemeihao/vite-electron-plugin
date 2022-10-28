@@ -65,3 +65,17 @@ function slash(p: string): string {
 export function normalizePath(id: string): string {
   return path.posix.normalize(isWindows ? slash(id) : id)
 }
+
+/**
+ * - `'' -> '.'`
+ * - `foo` -> `./foo`
+ */
+export function relativeify(relative: string) {
+  if (relative === '') {
+    return '.'
+  }
+  if (!relative.startsWith('.')) {
+    return './' + relative
+  }
+  return relative
+}

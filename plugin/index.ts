@@ -1,8 +1,13 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { type ViteDevServer } from 'vite'
 import type { Plugin, ResolvedConfig } from '..'
-import { colours, ensureDir, logger, normalizePath } from '../src/utils'
+import {
+  colours,
+  ensureDir,
+  logger,
+  normalizePath,
+  relativeify,
+} from '../src/utils'
 
 // TODO: use ast implement alias plugin
 export function alias(options: {
@@ -49,7 +54,7 @@ export function alias(options: {
           replacement = path.relative(path.dirname(importer), replacement)
         }
         // Convert to unix path
-        replacement = replacement.split(path.sep).join('/')
+        replacement = relativeify(normalizePath(replacement))
         code = code.slice(0, start) + raw.replace(find, replacement) + code.slice(end)
       }
 
