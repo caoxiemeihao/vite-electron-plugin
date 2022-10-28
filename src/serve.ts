@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import { normalizePath, type ViteDevServer } from 'vite'
 import {
   type Configuration,

@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import { type Loader, transform } from 'esbuild'
 import {
   type Configuration,

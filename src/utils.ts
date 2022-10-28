@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 export function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
   let t: NodeJS.Timeout

@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { type ViteDevServer, normalizePath } from 'vite'
 import type { Plugin, ResolvedConfig } from '..'
 import { colours, ensureDir, logger } from '../src/utils'
