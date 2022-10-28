@@ -46,8 +46,10 @@ export function alias(options: {
 
         let { find, replacement } = option
         if (path.isAbsolute(replacement)) {
-          replacement = path.posix.relative(path.dirname(importer), replacement)
+          replacement = path.relative(path.dirname(importer), replacement)
         }
+        // Convert to unix path
+        replacement = replacement.split(path.sep).join('/')
         code = code.slice(0, start) + raw.replace(find, replacement) + code.slice(end)
       }
 
