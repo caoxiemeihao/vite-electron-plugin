@@ -1,11 +1,11 @@
-import fs from 'fs'
-import { normalizePath, type ViteDevServer } from 'vite'
+import fs from 'node:fs'
+import type { ViteDevServer } from 'vite'
 import {
   type Configuration,
   resolveConfig,
 } from './config'
 import { build } from './build'
-import { ensureDir, jsType } from './utils'
+import { ensureDir, jsType, normalizePath } from './utils'
 
 export async function bootstrap(config: Configuration, server: ViteDevServer) {
   process.env.VITE_DEV_SERVER_URL = resolveEnv(server)!.url

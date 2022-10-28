@@ -1,3 +1,15 @@
+## 0.4.7 (2022-10-28)
+
+- db5e1a7 v0.4.7
+- 554d772 (main) chore: cleanup
+- f67afd8 chore: update types
+- 6dbf474 chore: implements `normalizePath()`
+- 36485b5 chore: `node:` prefix
+- 78f64f3 (github/main) Merge pull request #20 from keyiis/main
+- f103920 Resolve path resolution errors in Windows environment
+- 5dd82a3 docs: update
+- ac398e2 chore: update comments
+
 ## 0.4.6 (2022-10-10)
 
 - df59e2a v0.4.6

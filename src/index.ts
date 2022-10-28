@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import { bootstrap } from './serve'
 import { build } from './build'
 import {
