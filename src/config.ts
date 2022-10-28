@@ -1,6 +1,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import type { ViteDevServer } from 'vite'
+import type {
+  ResolvedConfig as ViteResolvedConfig,
+  ViteDevServer,
+} from 'vite'
 import fastGlob from 'fast-glob'
 import { watch } from 'chokidar'
 import { resolvePlugins } from './plugin'
@@ -50,13 +53,15 @@ export interface ResolvedConfig {
 
   config: Configuration
   /** Vite's command */
-  command: 'build' | 'serve',
+  command: import('vite').ResolvedConfig['command']
   /** @default ['.ts', '.tsx', '.js', '.jsx'] */
   extensions: string[]
   /** The value is `null` at build time */
   watcher: import('chokidar').FSWatcher | null
+  /** Resolved config of Vite */
+  viteResolvedConfig: import('vite').ResolvedConfig
   /** The value is `null` at build time */
-  viteDevServer: import('vite').ViteDevServer | null,
+  viteDevServer: import('vite').ViteDevServer | null
   /** Internal functions (🚨 Experimental) */
   _fn: {
     /** Electron App startup function */
@@ -73,7 +78,7 @@ export type Plugin = Required<Configuration>['plugins'][number]
 
 export async function resolveConfig(
   config: Configuration,
-  command: ResolvedConfig['command'],
+  viteResolvedConfig: ViteResolvedConfig,
   viteDevServer: ViteDevServer | null = null
 ): Promise<ResolvedConfig> {
   // @ts-ignore
@@ -104,9 +109,10 @@ export async function resolveConfig(
     }, transformOptions),
 
     config,
-    command,
+    command: viteResolvedConfig.command,
     extensions: JS_EXTENSIONS,
     watcher: null,
+    viteResolvedConfig,
     viteDevServer,
     _fn: {
       async startup(args = ['.', '--no-sandbox']) {
@@ -133,7 +139,7 @@ export async function resolveConfig(
     },
   }
 
-  if (command === 'serve') {
+  if (resolved.command === 'serve') {
     resolved.watcher = watch(/* 🚨 Any file */include2globs(resolved))
   }
 
