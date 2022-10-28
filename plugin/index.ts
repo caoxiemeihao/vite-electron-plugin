@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { type ViteDevServer, normalizePath } from 'vite'
+import { type ViteDevServer } from 'vite'
 import type { Plugin, ResolvedConfig } from '..'
-import { colours, ensureDir, logger } from '../src/utils'
+import { colours, ensureDir, logger, normalizePath } from '../src/utils'
 
 // TODO: use ast implement alias plugin
 export function alias(options: {

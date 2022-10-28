@@ -1,10 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { type ViteDevServer, normalizePath } from 'vite'
+import type { ViteDevServer } from 'vite'
 import fastGlob from 'fast-glob'
 import { watch } from 'chokidar'
 import { resolvePlugins } from './plugin'
-import { JS_EXTENSIONS } from './utils'
+import { JS_EXTENSIONS, normalizePath } from './utils'
 
 export interface Configuration {
   /** Like Vite's plugin */

@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import os from 'node:os'
 
 export function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
   let t: NodeJS.Timeout
@@ -55,4 +56,12 @@ export const logger: Record<Parameters<typeof log>[0] | 'log', (...message: stri
   success: (...message: string[]) => log('success', ...message),
   warn: (...message: string[]) => log('warn', ...message),
   log: (...message: string[]) => console.log(...message),
+}
+
+const isWindows = os.platform() === 'win32'
+function slash(p: string): string {
+  return p.replace(/\\/g, '/')
+}
+export function normalizePath(id: string): string {
+  return path.posix.normalize(isWindows ? slash(id) : id)
 }
