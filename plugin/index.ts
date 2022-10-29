@@ -138,3 +138,25 @@ export function customStart(callback?: (args?: {
     },
   }
 }
+
+export function loadViteEnv(): Plugin {
+  let config: ResolvedConfig
+
+  return {
+    name: 'plugin-load-vite-env',
+    configResolved(_config) {
+      config = _config
+    },
+    transform(args) {
+      let code = args.code
+      const { env } = config.viteResolvedConfig
+      for (const [key, value] of Object.entries(env)) {
+        code = code.replaceAll(
+          new RegExp(`\\bprocess\\.env\\.${key}\\b`, 'g'),
+          JSON.stringify(value),
+        )
+      }
+      return code
+    },
+  }
+}
