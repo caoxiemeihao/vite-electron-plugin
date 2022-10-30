@@ -140,23 +140,15 @@ export function customStart(callback?: (args?: {
 }
 
 export function loadViteEnv(): Plugin {
-  let config: ResolvedConfig
-
   return {
     name: 'plugin-load-vite-env',
-    configResolved(_config) {
-      config = _config
-    },
-    transform(args) {
-      let code = args.code
+    configResolved(config) {
       const { env } = config.viteResolvedConfig
-      for (const [key, value] of Object.entries(env)) {
-        code = code.replaceAll(
-          new RegExp(`\\bprocess\\.env\\.${key}\\b`, 'g'),
-          JSON.stringify(value),
-        )
-      }
-      return code
+      // Use words array instead `import.meta.env` for avoid esbuild transform. 🤔
+      const words = ['import', 'meta', 'env']
+      config.transformOptions.define = Object.fromEntries(Object
+        .entries(env)
+        .map(([key, value]) => [words.concat(key).join('.'), JSON.stringify(value)]))
     },
   }
 }
