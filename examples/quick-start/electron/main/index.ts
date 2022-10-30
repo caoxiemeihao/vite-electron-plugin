@@ -22,9 +22,9 @@ let win: BrowserWindow
 const preload = path.join(process.env.DIST, 'preload.js')
 
 // From .env files
-console.log(process.env.VITE_TEST_STRING)
-console.log(process.env.VITE_TEST_NUMVER)
-console.log(process.env.VITE_TEST_BOOLEAN)
+import.meta.env.VITE_TEST_STRING
+import.meta.env.VITE_TEST_NUMVER
+import.meta.env.VITE_TEST_BOOLEAN
 
 function bootstrap() {
   win = new BrowserWindow({
