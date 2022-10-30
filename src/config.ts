@@ -156,17 +156,12 @@ function include2files(config: ResolvedConfig, include = config.include) {
 
 function include2globs(config: ResolvedConfig, files = config.include) {
   const { root } = config
-  return files
-    .map(p => path.join(root, p))
-    .map(p => {
-      try {
-        const stat = fs.statSync(p)
-        if (stat.isDirectory()) {
-          return path.join(p, '**/*')
-        }
-      } catch { }
-      return p
-    })
+  return files.map((p) =>{
+    let wholePath = path.join(root, p);
+    let stat = fs.statSync(wholePath);
+    if (stat.isDirectory()) wholePath = path.join(wholePath, "**/*");
+    return wholePath.split(path.sep).join('/');
+  });
 }
 
 function input2output(
