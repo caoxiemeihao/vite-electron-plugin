@@ -1,3 +1,16 @@
+## 0.5.0 (2022-10-31)
+
+- 9a243ff v0.5.0
+- 6806356 docs: v0.5.0
+- 05bd414 chore: cleanup
+- d0c67a5 refactor(plugin): `process.env.XXX` -> `import.meta.env.XXX`
+- 7666a05 chore(deps): bump vite to 3.2.1
+- f82007a feat(examples): quick-start v0.5.0
+- f5ff091 chore: backup
+- 75eb4b5 chore: `"target": "ES2022"`
+- ca726f5 feat(plugin): `loadViteEnv()`
+- fa86b10 feat: add `ResolvedConfig['viteResolvedConfig']`
+
 ## 0.4.7 (2022-10-28)
 
 - db5e1a7 v0.4.7
