@@ -173,6 +173,7 @@ function include2globs(config: ResolvedConfig, files = config.include) {
       } catch { }
       return p
     })
+    .map(p => normalizePath(p))
 }
 
 function input2output(
@@ -216,7 +217,7 @@ function input2output(
   } */
 
   const file = normalizePath(filename).replace(root + '/', '')
-  const destname = path.join(
+  const destname = path.posix.join(
     outDir,
     config.include.length === 1
       // If include contains only one item, it will remove 1 level of dir
