@@ -1,5 +1,6 @@
 ## 0.5.0 (2022-10-31)
 
+- c53008c fix(#26): normalizePath
 - 9a243ff v0.5.0
 - 6806356 docs: v0.5.0
 - 05bd414 chore: cleanup
