@@ -124,6 +124,7 @@ import {
   alias,
   copy,
   customStart,
+  loadViteEnv,
 } from 'vite-electron-plugin/plugin'
 
 export default {
@@ -145,6 +146,10 @@ export default {
           // If you want to control the launch of Electron App yourself.
           startup()
         }),
+
+        // https://vitejs.dev/guide/env-and-mode.html#env-files
+        // Support use `import.meta.env.VITE_SOME_KEY` in Electron-Main
+        loadViteEnv(),
       ],
     }),
   ],

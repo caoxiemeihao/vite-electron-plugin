@@ -10,7 +10,7 @@ import { ensureDir, jsType, normalizePath } from './utils'
 export async function bootstrap(config: Configuration, server: ViteDevServer) {
   process.env.VITE_DEV_SERVER_URL = resolveEnv(server)!.url
 
-  const resolved = await resolveConfig(config, 'serve', server)
+  const resolved = await resolveConfig(config, server.config, server)
   const {
     _fn,
     watcher,

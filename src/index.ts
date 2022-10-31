@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import type { ResolvedConfig as ViteResolvedConfig } from 'vite'
 import { bootstrap } from './serve'
 import { build } from './build'
 import {
@@ -24,6 +25,8 @@ function defineConfig(config: Configuration) {
 }
 
 function electron(config: Configuration): import('vite').Plugin[] {
+  let viteResolvedConfig: ViteResolvedConfig
+
   return [
     {
       name: `${name}:serve`,
@@ -39,8 +42,11 @@ function electron(config: Configuration): import('vite').Plugin[] {
         // Make sure that Electron App can be loaded into the local file using `loadFile` after build
         config.base ??= './'
       },
+      configResolved(config) {
+        viteResolvedConfig = config
+      },
       async closeBundle() {
-        const resolved = await resolveConfig(config, 'build')
+        const resolved = await resolveConfig(config, viteResolvedConfig)
         const { _fn, plugins } = resolved
         for (const filename of _fn.include2files(resolved)) {
           const js_type = jsType(filename)

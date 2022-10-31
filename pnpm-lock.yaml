@@ -10,7 +10,7 @@ importers:
       fast-glob: ^3.2.12
       rollup: ^2.79.1
       typescript: ^4.8.3
-      vite: ^3.2.0-beta.0
+      vite: ^3.2.1
     dependencies:
       chokidar: 3.5.3
       fast-glob: 3.2.12
@@ -19,42 +19,42 @@ importers:
       esbuild: 0.15.9
       rollup: 2.79.1
       typescript: 4.8.3
-      vite: 3.2.0-beta.0
+      vite: 3.2.1
 
   examples/alias:
     specifiers:
       electron: ^21.0.1
       typescript: ^4.8.3
-      vite: ^3.2.0-beta.0
+      vite: ^3.2.1
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 21.0.1
       typescript: 4.8.3
-      vite: 3.2.0-beta.0
+      vite: 3.2.1
       vite-electron-plugin: link:../..
 
   examples/copy:
     specifiers:
       electron: ^21.0.1
       typescript: ^4.8.3
-      vite: ^3.2.0-beta.0
+      vite: ^3.2.1
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 21.0.1
       typescript: 4.8.3
-      vite: 3.2.0-beta.0
+      vite: 3.2.1
       vite-electron-plugin: link:../..
 
   examples/custom-start-electron-app:
     specifiers:
       electron: ^21.0.1
       typescript: ^4.8.3
-      vite: ^3.2.0-beta.0
+      vite: ^3.2.1
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 21.0.1
       typescript: 4.8.3
-      vite: 3.2.0-beta.0
+      vite: 3.2.1
       vite-electron-plugin: link:../..
 
   examples/quick-start:
@@ -62,13 +62,13 @@ importers:
       electron: ^21.0.1
       electron-builder: ^23.3.3
       typescript: ^4.8.3
-      vite: ^3.2.0-beta.0
+      vite: ^3.2.1
       vite-electron-plugin: workspace:*
     devDependencies:
       electron: 21.0.1
       electron-builder: 23.3.3
       typescript: 4.8.3
-      vite: 3.2.0-beta.0
+      vite: 3.2.1
       vite-electron-plugin: link:../..
 
 packages:
@@ -1901,8 +1901,8 @@ packages:
       xmlbuilder: 15.1.1
     dev: true
 
-  /postcss/8.4.17:
-    resolution: {integrity: sha512-UNxNOLQydcOFi41yHNMcKRZ39NeXlr8AxGuZJsdub8vIb12fHzcq37DTU/QtbI6WLxNg2gF9Z+8qtRwTj1UI1Q==}
+  /postcss/8.4.18:
+    resolution: {integrity: sha512-Wi8mWhncLJm11GATDaQKobXSNEYGUHeQLiQqDFG1qQ5UTDPTEvKw0Xt5NsTpktGTwLps3ByrWsBrG0rB8YQ9oA==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
       nanoid: 3.3.4
@@ -2340,8 +2340,8 @@ packages:
     dev: true
     optional: true
 
-  /vite/3.2.0-beta.0:
-    resolution: {integrity: sha512-sIqxi9gLVl+ysDfioIpZjDN8PxF5ary2zRoHVWspqWteKuoCul4ExyXBK7+hkRHHJEJbbJABY2+vWAb/2sYmPg==}
+  /vite/3.2.1:
+    resolution: {integrity: sha512-ADtMkfHuWq4tskJsri2n2FZkORO8ZyhI+zIz7zTrDAgDEtct1jdxOg3YsZBfHhKjmMoWLOSCr+64qrEDGo/DbQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -2363,7 +2363,7 @@ packages:
         optional: true
     dependencies:
       esbuild: 0.15.9
-      postcss: 8.4.17
+      postcss: 8.4.18
       resolve: 1.22.1
       rollup: 2.79.1
     optionalDependencies:
