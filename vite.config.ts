@@ -1,3 +1,7 @@
+import fs from 'fs'
+import path from 'path'
+import { spawn } from 'child_process'
+import { builtinModules } from 'module'
 import {
   type InlineConfig,
   type UserConfig,
@@ -5,7 +9,7 @@ import {
   mergeConfig,
   build,
 } from 'vite'
-import { builtinModules } from 'module'
+// import { COLOURS } from 'vite-plugin-utils/function' - cjs not support 😅
 import pkg from './package.json'
 
 const config: UserConfig = {
@@ -36,6 +40,7 @@ export default mergeConfig(config, {
     name: 'build-plugin',
     configResolved(config) {
       buildPlugin(config.build.watch)
+      generateTypes()
     },
   }],
   build: {
@@ -62,4 +67,30 @@ function buildPlugin(watch: Required<BuildOptions>['watch']) {
       },
     },
   } as InlineConfig))
+}
+
+function generateTypes() {
+  const types = path.join(__dirname, 'types')
+  const types_src = path.join(__dirname, 'types/src')
+  fs.rmSync(types, { recursive: true, force: true })
+
+  return new Promise(resolve => {
+    const cp = spawn(
+      process.platform === 'win32' ? 'npm.cmd' : 'npm',
+      ['run', 'types'],
+    )
+    cp.on('exit', code => {
+      // console.log(COLOURS.cyan('[types]'), 'declaration generated')
+      console.log('[types]', 'declaration generated')
+      resolve(code)
+    })
+  }).then(() => {
+    const files = fs.readdirSync(types_src)
+    for (const file of files) {
+      const filename = path.join(types_src, file)
+      fs.copyFileSync(filename, filename.replace('src', ''))
+    }
+    fs.rmSync(types_src, { recursive: true, force: true })
+    console.log('[types]', 'declaration files moved to types')
+  })
 }
