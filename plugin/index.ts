@@ -150,5 +150,13 @@ export function loadViteEnv(): Plugin {
         .entries(env)
         .map(([key, value]) => [words.concat(key).join('.'), JSON.stringify(value)]))
     },
+    transform({ code }) {
+      const import_meta = 'const import_meta = {}'
+      const import_meta_polyfill = 'const import_meta = { url: "file:" + __filename, env: {/* Vite\'s shim */} }'
+      if (code.includes(import_meta)) {
+        // https://github.com/evanw/esbuild/issues/2441
+        return code.replace(import_meta, import_meta_polyfill)
+      }
+    },
   }
 }
