@@ -13,9 +13,8 @@ export async function build(config: ResolvedConfig, filename: string) {
       filename, '->', destname,
     )
   } else {
-    ensureDir(destname)
-
     let code = fs.readFileSync(filename, 'utf8')
+    let mappings: string | SourceMap // TODO: merge mappings 🤔
     let done = false
     for (const plugin of plugins) {
       if (done) break
@@ -28,19 +27,36 @@ export async function build(config: ResolvedConfig, filename: string) {
       if (!result) continue
       if (typeof result === 'string') {
         code = result
-      } else if (result !== null && typeof result === 'object') {
+      } else if (Object.prototype.toString.call(result) === '[object Object]') {
+        code = result.code
+        if (result.map != null) {
+          mappings = result.map
+        }
         if (result.warnings.length) {
           logger.warn(result.warnings.map(e => e.text).join('\n'))
         }
-        code = result.code
-        if (result.map) {
-          const map = JSON.parse(result.map)
-          const parsed = path.parse(destname)
-          map.file = parsed.base
-          map.sources = [path.relative(parsed.dir, filename)]
-          fs.writeFileSync(destname + '.map', JSON.stringify(map))
-          code += `\n//# sourceMappingURL=${path.basename(destname)}.map`
+      }
+    }
+
+    ensureDir(destname)
+
+    if (mappings!) {
+      let map: SourceMap
+      if (typeof mappings === 'string') {
+        try {
+          map = JSON.parse(mappings)
+        } catch (error) {
+          logger.warn('[sourcemap]:\n', error as string)
         }
+      } else {
+        map = mappings
+      }
+      if (map!) {
+        const parsed = path.parse(destname)
+        map.file = parsed.base
+        map.sources = [path.relative(parsed.dir, filename)]
+        fs.writeFileSync(destname + '.map', JSON.stringify(map))
+        code += `\n//# sourceMappingURL=${path.basename(destname)}.map`
       }
     }
 
@@ -50,5 +66,34 @@ export async function build(config: ResolvedConfig, filename: string) {
       colours.gary(new Date().toLocaleTimeString()),
       `${destname}`,
     )
+  }
+}
+
+/**
+ * @see https://sourcemaps.info/spec.html
+ */
+class SourceMap {
+  version = 3
+  file: string
+  sourceRoot: string
+  sources: string[]
+  sourcesContent: (string | null)[]
+  names: string[]
+  mappings: string
+
+  constructor(map: {
+    file?: string
+    sourceRoot?: string
+    sources?: string[]
+    sourcesContent?: (string | null)[]
+    names?: string[]
+    mappings?: string
+  } = {}) {
+    this.file = map.file ?? ''
+    this.sourceRoot = map.sourceRoot ?? ''
+    this.sources = map.sources ?? []
+    this.sourcesContent = map.sourcesContent ?? []
+    this.names = map.names ?? []
+    this.mappings = map.mappings ?? ''
   }
 }
