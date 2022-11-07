@@ -1,3 +1,10 @@
+## 0.5.1 (2022-11-07)
+
+- 11223b0 v0.5.1
+- 963c283 feat(#33): generate types
+- 4dcccee feat: polyfill `import.meta.env`
+- 1fb98b4 feat: reuse sourcemap 🌱
+
 ## 0.5.0 (2022-10-31)
 
 - c53008c fix(#26): normalizePath
