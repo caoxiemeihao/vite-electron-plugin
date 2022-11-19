@@ -5,12 +5,10 @@
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "allowJs": true,
+    "emitDeclarationOnly": true,
     "declaration": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "emitDeclarationOnly": true,
     "strict": true
   }
 }
