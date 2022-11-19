@@ -1,3 +1,8 @@
+## 0.5.2 (2022-11-20)
+
+- b0a21c1 refactor(build): better scripts
+- 0d689fe Merge pull request #38 from thepiper/main
+
 ## 0.5.1 (2022-11-07)
 
 - 11223b0 v0.5.1
