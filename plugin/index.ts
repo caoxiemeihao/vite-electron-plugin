@@ -21,7 +21,7 @@ export function alias(options: {
     name: 'plugin-alias',
     async transform({ code: source, filename: importer }) {
       let code = source
-      let match = null
+      let match: RegExpExecArray | null = null
       requireRE.lastIndex = 0
       const nodes: {
         start: number

@@ -1,5 +1,6 @@
 /**
  * TODO: will generate additional `utils.hash.js` 🤔
+ * 2022-11-19 The utils.ts file is used in both src and plugin, which will result in a common `utils.hash.js` file
  */
 import { builtinModules } from 'module'
 import { defineConfig } from 'vite'

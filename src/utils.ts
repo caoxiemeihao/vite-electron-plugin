@@ -4,11 +4,11 @@ import os from 'node:os'
 
 export function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
   let t: NodeJS.Timeout
-  return ((...args) => {
+  return <Fn>((...args) => {
     // !t && fn(...args) // first call
     clearTimeout(t)
     t = setTimeout(() => fn(...args), delay)
-  }) as Fn
+  })
 }
 
 /**

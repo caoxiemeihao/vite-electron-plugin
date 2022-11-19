@@ -8,7 +8,6 @@ import {
   type Plugin,
   resolveConfig,
 } from './config'
-import { name } from '../package.json'
 import { ensureDir, jsType } from './utils'
 
 // public export
@@ -29,14 +28,14 @@ function electron(config: Configuration): import('vite').Plugin[] {
 
   return [
     {
-      name: `${name}:serve`,
+      name: 'vite-electron-plugin',
       apply: 'serve',
       async configureServer(server) {
         server.httpServer!.on('listening', () => bootstrap(config, server))
       },
     },
     {
-      name: `${name}:build`,
+      name: 'vite-electron-plugin',
       apply: 'build',
       config(config) {
         // Make sure that Electron App can be loaded into the local file using `loadFile` after build

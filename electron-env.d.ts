@@ -7,7 +7,7 @@ declare namespace NodeJS {
 
   interface Process {
     electronApp: import('child_process').ChildProcess
-    _resolved_config: import('./types/config').ResolvedConfig
+    _resolved_config: import('.').ResolvedConfig
   }
 }
 
