@@ -1,15 +1,14 @@
 # vite-electron-plugin
 
-Fast, Electron plugin for Vite
+High-performance, esbuild-based Vite Electron plugin
 
 [![NPM version](https://img.shields.io/npm/v/vite-electron-plugin.svg)](https://npmjs.org/package/vite-electron-plugin)
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-electron-plugin.svg)](https://npmjs.org/package/vite-electron-plugin)
 
-- 🚀 Fast <sub><sup>(Not Bundle, based on esbuild)</sup></sub>
-- 🎯 Plugin <sub><sup>(Like Vite's plugin)</sup></sub>
-- 🔥 Hot reload
-- 📦 Out of the box
+- 🚀 High-performance <sub><sup>(Not Bundle, based on esbuild)</sup></sub>
+- 🎯 Support Plugin <sub><sup>(Like Vite's plugin)</sup></sub>
 - 🌱 What you see is what you get
+- 🔥 Hot restart
 
 ## Install
 
@@ -19,10 +18,10 @@ npm i vite-electron-plugin -D
 
 ## Examples
 
-- [quick-start](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/quick-start)
-- [plugin/alias](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/alias)
-- [plugin/copy](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/copy)
-- [plugin/custom-start-electron-app](https://github.com/caoxiemeihao/vite-electron-plugin/tree/main/examples/custom-start-electron-app)
+- [quick-start](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/quick-start)
+- [plugin/alias](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/alias)
+- [plugin/copy](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/copy)
+- [plugin/custom-start-electron-app](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/custom-start-electron-app)
 
 ## Recommend structure
 
@@ -217,9 +216,7 @@ export interface ResolvedConfig {
   /** The value is `null` at build time */
   viteDevServer: import('vite').ViteDevServer | null,
   /** Internal functions (🚨 Experimental) */
-  _fn: {
-    /** Electron App startup function */
-    startup: (args?: string[]) => void
+  experimental: {
     /** Reload Electron-Renderer */
     reload: () => void
     include2files: (config: ResolvedConfig, include?: string[]) => string[]

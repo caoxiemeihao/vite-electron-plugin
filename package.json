@@ -1,7 +1,7 @@
 {
   "name": "vite-electron-plugin",
   "version": "0.5.2",
-  "description": "Fast, Electron plugin for Vite",
+  "description": "High-performance, esbuild-based Vite Electron plugin",
   "main": "index.mjs",
   "types": "types",
   "exports": {
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/caoxiemeihao/vite-electron-plugin.git"
+    "url": "git+https://github.com/electron-vite/vite-electron-plugin.git"
   },
   "author": "草鞋没号 <308487730@qq.com>",
   "license": "MIT",
