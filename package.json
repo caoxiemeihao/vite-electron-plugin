@@ -2,7 +2,7 @@
   "name": "vite-electron-plugin",
   "version": "0.5.2",
   "description": "High-performance, esbuild-based Vite Electron plugin",
-  "main": "index.mjs",
+  "main": "index.js",
   "types": "types",
   "exports": {
     ".": {
