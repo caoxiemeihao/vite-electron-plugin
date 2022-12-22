@@ -6,8 +6,8 @@ declare namespace NodeJS {
   }
 
   interface Process {
-    electronApp: import('child_process').ChildProcess
-    _resolved_config: import('.').ResolvedConfig
+    electronApp?: import('child_process').ChildProcess
+    _plugin_watcher?: import('notbundle').FSWatcher
   }
 }
 
