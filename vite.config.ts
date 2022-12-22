@@ -1,21 +1,29 @@
-import fs from 'fs'
-import path from 'path'
 import { spawn } from 'child_process'
 import { builtinModules } from 'module'
-import {
-  type InlineConfig,
-  type UserConfig,
-  type BuildOptions,
-  mergeConfig,
-  build,
-} from 'vite'
-// import { COLOURS } from 'vite-plugin-utils/function' - cjs not support 😅
+import { defineConfig } from 'vite'
 import pkg from './package.json'
 
-const config: UserConfig = {
+export default defineConfig({
+  plugins: [{
+    name: 'build-plugin',
+    configResolved() {
+      generateTypes()
+    },
+  }],
   build: {
     minify: false,
     emptyOutDir: false,
+    outDir: '',
+    lib: {
+      entry: {
+        plugin: 'plugin/index.ts',
+        src: 'src/index.ts',
+      },
+      formats: ['cjs', 'es'],
+      fileName: (format, entryName) => entryName === 'plugin'
+        ? (format === 'es' ? 'plugin/index.mjs' : 'plugin/index.js')
+        : (format === 'es' ? 'index.mjs' : 'index.js'),
+    },
     rollupOptions: {
       external: [
         'electron',
@@ -32,59 +40,21 @@ const config: UserConfig = {
         exports: 'named',
       },
     },
+    target: 'node14',
   },
-}
-
-export default mergeConfig(config, {
-  plugins: [{
-    name: 'build-plugin',
-    configResolved(config) {
-      buildPlugin(config.build.watch)
-      generateTypes().then(() => {
-        // Remove the extra generated `utils.d.ts` due to build plugin.
-        fs.rmSync(path.join(__dirname, 'src/utils.d.ts'))
-      })
-    },
-  }],
-  build: {
-    outDir: '',
-    lib: {
-      entry: 'src/index.ts',
-      formats: ['cjs', 'es'],
-      fileName: format => format === 'es' ? '[name].mjs' : '[name].js',
-    },
-  },
-} as UserConfig)
-
-function buildPlugin(watch: Required<BuildOptions>['watch']) {
-  build(mergeConfig(config, {
-    // Avoid recursive builds
-    configFile: false,
-    build: {
-      watch,
-      outDir: 'plugin',
-      lib: {
-        entry: 'plugin/index.ts',
-        formats: ['cjs', 'es'],
-        fileName: format => format === 'es' ? '[name].mjs' : '[name].js',
-      },
-    },
-  } as InlineConfig))
-}
+})
 
 function generateTypes() {
-  const types = path.join(__dirname, 'types')
-  fs.rmSync(types, { recursive: true, force: true })
-
   return new Promise(resolve => {
     const cp = spawn(
       process.platform === 'win32' ? 'npm.cmd' : 'npm',
       ['run', 'types'],
+      { stdio: 'inherit' },
     )
     cp.on('exit', code => {
-      // console.log(COLOURS.cyan('[types]'), 'declaration generated')
-      console.log('[types]', 'declaration generated')
+      !code && console.log('[types]', 'declaration generated')
       resolve(code)
     })
+    cp.on('error', process.exit)
   })
 }
