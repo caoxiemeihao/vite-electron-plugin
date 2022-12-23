@@ -1,3 +1,55 @@
+## 0.6.0 (2022-12-23)
+
+#### Features
+
+**JavaScript API**
+
+```ts
+import {
+  type Configuration,
+  type ResolvedConfig,
+  type Plugin,
+  build,
+  watch,
+  startup,
+  defineConfig,
+  default as electron,
+} from 'vite-electron-plugin'
+```
+
+Example:
+
+```js
+// dev
+watch({
+  include: [
+    // The Electron source codes directory
+    'electron',
+  ],
+  plugins: [
+    {
+      name: 'plugin-electron-startup',
+      ondone() {
+        // Startup Electron App
+        startup()
+      },
+    },
+  ],
+})
+
+// build
+build({
+  include: ['electron'],
+})
+```
+
+#### Commit
+
+- ffe8e8b refactor: based notbundle
+- 79d8dee chore: bump deps
+- e36d86e refactor: better build
+- 97e53fa refactor!: use `notbundle`, export JavaScript API 🌱
+
 ## 0.5.2 (2022-11-20)
 
 - b0a21c1 refactor(build): better scripts

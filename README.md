@@ -82,6 +82,83 @@ app.whenReady().then(() => {
 })
 ```
 
+## Configuration
+
+###### `electron(config: Configuration)`
+
+<table>
+  <thead>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Default</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>include</td>
+      <td><code>Array</code></td>
+      <td>
+        <code>directory</code> or <code>filename</code> or <code>glob</code> Array.<br/>
+        Must be a relative path, which will be calculated based on the <code>root</code>.<br/>
+        If it is an absolute path, it can only be a subpath of root.<br/>
+        Otherwise it will cause the output file path to be calculated incorrectly.<br/>
+      </td>
+      <td>✅</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>root</td>
+      <td><code>string</code></td>
+      <td></td>
+      <td></td>
+      <td><code>process.cwd()</code></td>
+    </tr>
+    <tr>
+      <td>outDir</td>
+      <td><code>string</code></td>
+      <td>Output Directory.</td>
+      <td></td>
+      <td><code>dist-electron</code></td>
+    </tr>
+    <tr>
+      <td>api</td>
+      <td><code>Record&lt;string, any&gt;</code></td>
+      <td>Useful if you want to pass some payload to the plugin.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>plugins</td>
+      <td><code>Plugin[]</code></td>
+      <td>See the Plugin API.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>logger</td>
+      <td><code>{ [type: string], (...message: string[]) => void }</code></td>
+      <td>Custom log. If <code>logger</code> is passed, all logs will be input this option</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>transformOptions</td>
+      <td><code>import('esbuild').TransformOptions</code></td>
+      <td>Options of <code>esbuild.transform()</code></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>watch</td>
+      <td><code>import('chokidar').WatchOptions</code></td>
+      <td>Options of <code>chokidar.watch()</code></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
 ## Plugin API
 
 > The design of plugin is similar to [Vite's plugin](https://vitejs.dev/guide/api-plugin.html). But simpler, only 4 hooks in total.
@@ -155,73 +232,43 @@ export default {
 }
 ```
 
-## API <sub><sup>(Define)</sup></sub>
-
-###### `electron(config: Configuration)`
+## JavaScript API
 
 ```ts
-export interface Configuration {
-  /** Like Vite's plugin */
-  plugins?: {
-    name: string
-    configResolved?: (config: ResolvedConfig) => void | Promise<void>
-    /** Triggered by `include` file changes. You can emit some files in this hooks. */
-    onwatch?: (envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void
-    /** Triggered by changes in `extensions` files in include */
-    transform?: (args: {
-      /** Raw filename */
-      filename: string
-      code: string
-      /** Skip subsequent transform hooks */
-      done: () => void
-    }) => string | null | void | import('esbuild').TransformResult | Promise<string | null | void | import('esbuild').TransformResult>
-    /** Triggered when `transform()` ends or a file in `extensions` is removed */
-    ondone?: (args: {
-      filename: string
-      destname: string
-    }) => void
-  }[],
-  /** @default process.cwd() */
-  root?: string
-  /** directory, filename, glob */
-  include: string[]
-  /** @default 'dist-electron' */
-  outDir?: string
-  /** Options of `esbuild.transform()` */
-  transformOptions?: import('esbuild').TransformOptions
-}
+import {
+  type Configuration,
+  type ResolvedConfig,
+  type Plugin,
+  build,
+  watch,
+  startup,
+  defineConfig,
+  default as electron,
+} from 'vite-electron-plugin'
 ```
 
-###### ResolvedConfig
+**Example**
 
-```ts
-export interface ResolvedConfig {
-  plugins: Required<Configuration>['plugins']
-  /** @default process.cwd() */
-  root: string
-  /** Relative path */
-  include: string[]
-  /** Absolute path */
-  outDir: string
-  /** Options of `esbuild.transform()` */
-  transformOptions: import('esbuild').TransformOptions
+```js
+// dev
+watch({
+  include: [
+    // The Electron source codes directory
+    'electron',
+  ],
+  plugins: [
+    {
+      name: 'plugin-electron-startup',
+      ondone() {
+        // Startup Electron App
+        startup()
+      },
+    },
+  ],
+})
 
-  config: Configuration
-  /** Vite's command */
-  command: 'build' | 'serve',
-  /** @default ['.ts', '.tsx', '.js', '.jsx'] */
-  extensions: string[]
-  /** The value is `null` at build time */
-  watcher: import('chokidar').FSWatcher | null
-  /** The value is `null` at build time */
-  viteDevServer: import('vite').ViteDevServer | null,
-  /** Internal functions (🚨 Experimental) */
-  experimental: {
-    /** Reload Electron-Renderer */
-    reload: () => void
-    include2files: (config: ResolvedConfig, include?: string[]) => string[]
-    include2globs: (config: ResolvedConfig, include?: string[]) => string[]
-    replace2dest: (filename: string, replace2js?: boolean) => string
-  }
-}
+// build
+build({
+  include: ['electron'],
+})
 ```

@@ -1,13 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { loadEnv } from 'vite'
+import { normalizePath } from 'notbundle'
 import type { Plugin, ResolvedConfig } from '..'
-import {
-  colours,
-  ensureDir,
-  logger,
-  normalizePath,
-  relativeify,
-} from '../src/utils'
 
 // TODO: use ast implement alias plugin
 export function alias(options: {
@@ -53,7 +48,7 @@ export function alias(options: {
         if (path.isAbsolute(replacement)) {
           replacement = path.relative(path.dirname(importer), replacement)
         }
-        // Convert to unix path
+        // Convert to POSIX path
         replacement = relativeify(normalizePath(replacement))
         code = code.slice(0, start) + raw.replace(find, replacement) + code.slice(end)
       }
@@ -101,7 +96,7 @@ export function copy(options: {
 
               ensureDir(destname)
               copyStream(filename, destname).on('finish', () =>
-                logger.log(colours.green('[plugin/copy]'), destname),
+                logger.log(colours.green('[plugin/copy]'), destname.replace(config.root + '/', '')),
               )
             }
           })
@@ -112,8 +107,8 @@ export function copy(options: {
 }
 
 export function customStart(callback?: (args?: {
-  startup: ResolvedConfig['_fn']['startup']
-  reload: ResolvedConfig['_fn']['reload']
+  startup: ResolvedConfig['experimental']['startup']
+  reload: ResolvedConfig['experimental']['reload']
   filename: string
   // arguments should be side-effect free
   // viteDevServer: ViteDevServer
@@ -128,10 +123,11 @@ export function customStart(callback?: (args?: {
       config.plugins.splice(_config.plugins.findIndex(plugin => plugin.name === ':startup'), 1)
     },
     ondone({ filename }) {
-      if (config?.command === 'serve' && callback) {
+      const { api: { vite }, experimental } = config
+      if (vite?.resolvedConfig?.command === 'serve' && callback) {
         callback({
-          startup: config._fn.startup,
-          reload: config._fn.reload,
+          startup: experimental.startup,
+          reload: experimental.reload,
           filename,
         })
       }
@@ -142,8 +138,22 @@ export function customStart(callback?: (args?: {
 export function loadViteEnv(): Plugin {
   return {
     name: 'plugin-load-vite-env',
-    configResolved(config) {
-      const { env } = config.viteResolvedConfig
+    async configResolved(config) {
+      const { api: { vite } } = config
+      let env = {}
+      if (vite?.resolvedConfig) {
+        env = vite.resolvedConfig.env ?? env
+      } else if (vite?.config) {
+        env = await new Promise(resolve => {
+          vite.config!.plugins ??= []
+          vite.config!.plugins.push({
+            name: 'plugin-get-env',
+            async config(_, { mode }) {
+              resolve(loadEnv(mode, config.root))
+            },
+          })
+        })
+      }
       // Use words array instead `import.meta.env` for avoid esbuild transform. 🤔
       const words = ['import', 'meta', 'env']
       config.transformOptions.define = Object.fromEntries(Object
@@ -159,4 +169,61 @@ export function loadViteEnv(): Plugin {
       }
     },
   }
+}
+
+// ----------------------------------------------- utils
+
+/**
+ * @see https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
+ * @see https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+ */
+const colours = {
+  $_$: (c: number) => (str: string) => `\x1b[${c}m` + str + '\x1b[0m',
+  gary: (str: string) => colours.$_$(90)(str),
+  cyan: (str: string) => colours.$_$(36)(str),
+  yellow: (str: string) => colours.$_$(33)(str),
+  green: (str: string) => colours.$_$(32)(str),
+  red: (str: string) => colours.$_$(31)(str),
+}
+
+function ensureDir(filename: string): string {
+  const dir = path.dirname(filename)
+  !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true })
+  return filename
+}
+
+type LogType = 'error' | 'info' | 'success' | 'warn' | 'log'
+const logger: Record<LogType, (...message: string[]) => void> & { $_$: (type: LogType, ...message: string[]) => void } = {
+  $_$: (type, ...message) => {
+    if (type !== 'log') {
+      const dict: Record<string, Exclude<keyof typeof colours, '$_$'>> = {
+        error: 'red',
+        info: 'cyan',
+        success: 'green',
+        warn: 'yellow',
+      }
+      const color = dict[type]
+      message = message.map(msg => colours[color](msg))
+    }
+    console.log(...message)
+  },
+  error: (...message) => logger.$_$('error', ...message),
+  info: (...message) => logger.$_$('info', ...message),
+  success: (...message) => logger.$_$('success', ...message),
+  warn: (...message) => logger.$_$('warn', ...message),
+  log: (...message) => console.log(...message),
+}
+
+/**
+ * - `'' -> '.'`
+ * - `foo` -> `./foo`
+ */
+export function relativeify(relative: string) {
+  if (relative === '') {
+    return '.'
+  }
+  if (!relative.startsWith('.')) {
+    return './' + relative
+  }
+  return relative
 }

@@ -1,236 +1,68 @@
-import fs from 'node:fs'
 import path from 'node:path'
-import type {
-  ResolvedConfig as ViteResolvedConfig,
-  ViteDevServer,
-} from 'vite'
-import fastGlob from 'fast-glob'
-import { watch } from 'chokidar'
-import { resolvePlugins } from './plugin'
-import { JS_EXTENSIONS, normalizePath } from './utils'
+import type { ViteDevServer, ResolvedConfig as ViteResolvedConfig, UserConfig } from 'vite'
+import { startup } from 'vite-plugin-electron'
+import {
+  type Configuration as Configuration2,
+  type ResolvedConfig as ResolvedConfig2,
+  normalizePath,
+} from 'notbundle'
 
-export interface Configuration {
-  /** Like Vite's plugin */
-  plugins?: {
-    name: string
-    configResolved?: (config: ResolvedConfig) => void | Promise<void>
-    /** Triggered by `include` file changes. You can emit some files in this hooks. */
-    onwatch?: (envet: 'add' | 'change' | 'addDir' | 'unlink' | 'unlinkDir', path: string) => void
-    /** Triggered by changes in `extensions` files in include */
-    transform?: (args: {
-      /** Raw filename */
-      filename: string
-      code: string
-      /** Skip subsequent transform hooks */
-      done: () => void
-    }) => string | null | void | import('esbuild').TransformResult | Promise<string | null | void | import('esbuild').TransformResult>
-    /** Triggered when `transform()` ends or a file in `extensions` is removed */
-    ondone?: (args: {
-      filename: string
-      destname: string
-    }) => void
-  }[],
-  /** @default process.cwd() */
-  root?: string
-  /** directory, filename, glob */
-  include: string[]
+export interface Configuration extends Omit<Configuration2, 'output' | 'plugins'> {
   /** @default 'dist-electron' */
   outDir?: string
-  /** Options of `esbuild.transform()` */
-  transformOptions?: import('esbuild').TransformOptions
+  api?: {
+    vite?: {
+      config?: UserConfig
+      resolvedConfig?: ViteResolvedConfig
+      server?: ViteDevServer
+    }
+    [key: string]: any
+  }
+  plugins?: (Omit<NonNullable<Configuration2['plugins']>[number], 'configResolved'> &
+  {
+    // Overwrite `ResolvedConfig`
+    configResolved?: (config: ResolvedConfig) => void | Promise<void>
+  })[]
 }
 
-export interface ResolvedConfig {
-  plugins: Required<Configuration>['plugins']
-  /** @default process.cwd() */
-  root: string
-  /** Relative path */
-  include: string[]
+export interface ResolvedConfig extends Omit<ResolvedConfig2, 'config' | 'output' | 'plugins' | 'experimental'> {
+  config: Configuration
   /** Absolute path */
   outDir: string
-  /** Options of `esbuild.transform()` */
-  transformOptions: import('esbuild').TransformOptions
-
-  config: Configuration
-  /** Vite's command */
-  command: import('vite').ResolvedConfig['command']
-  /** @default ['.ts', '.tsx', '.js', '.jsx'] */
-  extensions: string[]
-  /** The value is `null` at build time */
-  watcher: import('chokidar').FSWatcher | null
-  /** Resolved config of Vite */
-  viteResolvedConfig: import('vite').ResolvedConfig
-  /** The value is `null` at build time */
-  viteDevServer: import('vite').ViteDevServer | null
+  api: NonNullable<Configuration['api']>
+  plugins: NonNullable<Configuration['plugins']>
   /** Internal functions (🚨 Experimental) */
-  _fn: {
+  experimental: Omit<ResolvedConfig2['experimental'], 'include2files' | 'include2globs'> & {
+    // Overwrite `ResolvedConfig`
+    include2files: (config: ResolvedConfig, include?: string[]) => string[]
+    include2globs: (config: ResolvedConfig, include?: string[]) => string[]
     /** Electron App startup function */
     startup: (args?: string[]) => void
     /** Reload Electron-Renderer */
     reload: () => void
-    include2files: (config: ResolvedConfig, include?: string[]) => string[]
-    include2globs: (config: ResolvedConfig, include?: string[]) => string[]
-    replace2dest: (filename: string, replace2js?: boolean) => string
   }
 }
 
-export type Plugin = Required<Configuration>['plugins'][number]
+export type Plugin = NonNullable<Configuration['plugins']>[number]
 
-export async function resolveConfig(
-  config: Configuration,
-  viteResolvedConfig: ViteResolvedConfig,
-  viteDevServer: ViteDevServer | null = null
-): Promise<ResolvedConfig> {
-  // @ts-ignore
-  // Vite hot reload vite.config.js
-  process._resolved_config?.watcher?.close()
-
+export function polyfillConfig(config: Configuration): Configuration {
   const {
-    root,
-    include,
     outDir = 'dist-electron',
-    transformOptions,
+    plugins = [],
   } = config
-  // https://github.com/vitejs/vite/blob/9a83eaffac3383f5ee68097807de532f0b5cb25c/packages/vite/src/node/config.ts#L456-L459
-  // resolve root
-  const resolvedRoot = normalizePath(
-    root ? path.resolve(root) : process.cwd()
-  )
-
-  const resolved: ResolvedConfig = {
-    plugins: resolvePlugins(config),
-    root: resolvedRoot,
-    include: include.map(p => normalizePath(p).replace(resolvedRoot + '/', '')),
-    outDir: normalizePath(path.isAbsolute(outDir) ? outDir : path.join(resolvedRoot, outDir)),
-    transformOptions: Object.assign({
-      target: 'node14',
-      // At present, Electron(20) can only support CommonJs
-      format: 'cjs',
-    }, transformOptions),
-
-    config,
-    command: viteResolvedConfig.command,
-    extensions: JS_EXTENSIONS,
-    watcher: null,
-    viteResolvedConfig,
-    viteDevServer,
-    _fn: {
-      async startup(args = ['.', '--no-sandbox']) {
-        const { spawn } = await import('child_process')
-        // @ts-ignore
-        const electronPath = (await import('electron')).default as string
-
-        if (process.electronApp) {
-          process.electronApp.removeAllListeners()
-          process.electronApp.kill()
-        }
-
-        // Start Electron.app
-        process.electronApp = spawn(electronPath, args, { stdio: 'inherit' })
-        // Exit command after Electron.app exits
-        process.electronApp.once('exit', process.exit)
-      },
-      reload() {
-        viteDevServer?.ws.send({ type: 'full-reload' })
-      },
-      include2files,
-      include2globs,
-      replace2dest: (filename: string, replace2js?: boolean) => input2output(resolved, filename, replace2js),
+  config.plugins = [<Plugin>{
+    name: ':polyfill-config',
+    configResolved(_config) {
+      _config.outDir = normalizePath(path.isAbsolute(outDir) ? outDir : path.join(_config.root, outDir))
+      _config.api = config.api ?? {}
+      _config.experimental.startup = startup
+      _config.experimental.reload = () => {
+        _config.config.api?.vite?.server?.ws.send({ type: 'full-reload' })
+      }
+      // @ts-ignore
+      // https://github.com/caoxiemeihao/notbundle/blob/v0.2.0/src/config.ts#L22-L26
+      _config.output = _config.outDir
     },
-  }
-
-  if (resolved.command === 'serve') {
-    resolved.watcher = watch(/* 🚨 Any file */include2globs(resolved))
-  }
-
-  for (const plugin of resolved.plugins) {
-    // call configResolved hooks
-    await plugin.configResolved?.(resolved)
-  }
-
-  // @ts-ignore
-  return process._resolved_config = resolved
-}
-
-// ----------------------------------------------------------------------
-
-function include2files(config: ResolvedConfig, include = config.include) {
-  return fastGlob
-    .sync(include2globs(config, include), { cwd: config.root })
-    .filter(p => config.extensions.includes(path.extname(p)))
-}
-
-function include2globs(config: ResolvedConfig, files = config.include) {
-  const { root } = config
-  return files
-    .map(p => path.join(root, p))
-    .map(p => {
-      try {
-        const stat = fs.statSync(p)
-        if (stat.isDirectory()) {
-          return path.join(p, '**/*')
-        }
-      } catch { }
-      return p
-    })
-    .map(p => normalizePath(p))
-}
-
-function input2output(
-  config: ResolvedConfig,
-  filename: string,
-  replace2js = false,
-) {
-  const { root, outDir } = config
-  /* if (input2output.reduce1level === false) {
-    // This behavior is the same as tsc
-
-    // e.g.
-    // single - include(['electron']) -> dist-electron
-    //
-    // ├─┬ electron
-    // │ ├─┬ main.ts
-    // │ │ └── index.ts
-    // │ └── preload.ts
-    //  ↓
-    // ├─┬ dist-electron
-    // │ ├─┬ main.js
-    // │ │ └── index.js
-    // │ └── preload.js
-
-    // e.g.
-    // multiple - include(['electron', 'preload.ts]) -> dist-electron/electron
-    //
-    // ├─┬ electron
-    // │ └─┬ main.ts
-    // │   └── index.ts
-    // └── preload.ts
-    //  ↓
-    // ├─┬ dist-electron
-    // │ ├─┬ electron
-    // │ │ └─┬ main.js
-    // │ │   └── index.js
-    // │ └── preload.js
-    input2output.reduce1level = include2files(config)
-      .map(file => file.replace(root + '/', ''))
-      .every(file => file.includes('/'))
-  } */
-
-  const file = normalizePath(filename).replace(root + '/', '')
-  const destname = path.posix.join(
-    outDir,
-    config.include.length === 1
-      // If include contains only one item, it will remove 1 level of dir
-      //
-      // e.g. - include(['electron'])
-      //   electron/main.ts -> dist-electron/main.js
-      //
-      // e.g. - include(['electron', 'preload.ts])
-      //   electron/main.ts -> dist-electron/electron/main.js
-      //   preload.ts       -> dist-electron/preload.js
-      ? file.slice(file.indexOf('/') + 1)
-      : file
-  )
-  const extname = path.extname(destname)
-  return (replace2js && config.extensions.includes(extname)) ? destname.replace(extname, '.js') : destname
+  }].concat(plugins)
+  return config
 }
