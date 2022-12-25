@@ -1,3 +1,9 @@
+## 0.6.1 (2022-12-25)
+
+- 55e4c75 chore: bump vite to 4.0.3
+- befb032 feat: bump notbundle to 0.3.1, `esbuildPlugin`
+- 4617849 feat: startup
+
 ## 0.6.0 (2022-12-23)
 
 #### Features
