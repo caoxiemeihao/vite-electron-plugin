@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { loadEnv } from 'vite'
-import { normalizePath } from 'notbundle'
+import { colours, normalizePath } from 'notbundle'
 import type { Plugin, ResolvedConfig } from '..'
 
 // TODO: use ast implement alias plugin
@@ -65,7 +65,7 @@ export function copy(options: {
   const copyStream = (filename: string, destname: string) => fs
     .createReadStream(filename)
     .pipe(fs.createWriteStream(destname))
-    .on('error', error => logger.error(error.message))
+    .on('error', error => console.log(colours.red(error.message)))
 
   return {
     name: 'plugin-copy',
@@ -96,7 +96,7 @@ export function copy(options: {
 
               ensureDir(destname)
               copyStream(filename, destname).on('finish', () =>
-                logger.log(colours.green('[plugin/copy]'), destname.replace(config.root + '/', '')),
+                console.log(colours.green('[plugin/copy]'), destname.replace(config.root + '/', '')),
               )
             }
           })
@@ -173,45 +173,10 @@ export function loadViteEnv(): Plugin {
 
 // ----------------------------------------------- utils
 
-/**
- * @see https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
- * @see https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
- */
-const colours = {
-  $_$: (c: number) => (str: string) => `\x1b[${c}m` + str + '\x1b[0m',
-  gary: (str: string) => colours.$_$(90)(str),
-  cyan: (str: string) => colours.$_$(36)(str),
-  yellow: (str: string) => colours.$_$(33)(str),
-  green: (str: string) => colours.$_$(32)(str),
-  red: (str: string) => colours.$_$(31)(str),
-}
-
 function ensureDir(filename: string): string {
   const dir = path.dirname(filename)
   !fs.existsSync(dir) && fs.mkdirSync(dir, { recursive: true })
   return filename
-}
-
-type LogType = 'error' | 'info' | 'success' | 'warn' | 'log'
-const logger: Record<LogType, (...message: string[]) => void> & { $_$: (type: LogType, ...message: string[]) => void } = {
-  $_$: (type, ...message) => {
-    if (type !== 'log') {
-      const dict: Record<string, Exclude<keyof typeof colours, '$_$'>> = {
-        error: 'red',
-        info: 'cyan',
-        success: 'green',
-        warn: 'yellow',
-      }
-      const color = dict[type]
-      message = message.map(msg => colours[color](msg))
-    }
-    console.log(...message)
-  },
-  error: (...message) => logger.$_$('error', ...message),
-  info: (...message) => logger.$_$('info', ...message),
-  success: (...message) => logger.$_$('success', ...message),
-  warn: (...message) => logger.$_$('warn', ...message),
-  log: (...message) => console.log(...message),
 }
 
 /**
