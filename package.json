@@ -24,7 +24,8 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "types": "rm -rf types && tsc -p tsconfig.build.json && tsc -p tsconfig.plugin.json",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run test && npm run build",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "esbuild": "*"
@@ -38,7 +39,8 @@
     "esbuild": "^0.16.10",
     "rollup": "^3.7.5",
     "typescript": "^4.9.4",
-    "vite": "^4.0.3"
+    "vite": "^4.0.3",
+    "vitest": "^0.26.2"
   },
   "files": [
     "plugin/index.js",
