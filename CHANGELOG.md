@@ -1,3 +1,10 @@
+## 0.6.2 (2022-12-26)
+
+- 9ce7a2e chore: bump notbundle to 0.3.2
+- 7eba408 feat: add test 🌱
+- f6dea8f chore: remove console.log
+- 0d5b382 refactor: cleanup
+
 ## 0.6.1 (2022-12-25)
 
 - 55e4c75 chore: bump vite to 4.0.3

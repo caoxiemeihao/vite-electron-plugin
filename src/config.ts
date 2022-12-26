@@ -74,12 +74,10 @@ export function polyfillConfig(config: Configuration): Configuration {
 }
 
 function esbuildPlugin(config: ResolvedConfig): Plugin {
-  console.log(config.transformOptions)
   config.transformOptions = {}
   // Electron only support cjs.
   config.transformOptions.format ??= 'cjs'
   config.transformOptions.target ??= 'node14'
-  console.log(config.transformOptions)
 
   let esbuild: typeof import('esbuild')
   return {
