@@ -7,14 +7,14 @@ importers:
       '@types/node': ^18.11.17
       esbuild: ^0.16.10
       fast-glob: ^3.2.12
-      notbundle: ~0.3.2
+      notbundle: ~0.3.3
       rollup: ^3.7.5
       typescript: ^4.9.4
       vite: ^4.0.3
       vitest: ^0.26.2
     dependencies:
       fast-glob: 3.2.12
-      notbundle: 0.3.2
+      notbundle: 0.3.3
     devDependencies:
       '@types/node': 18.11.17
       esbuild: 0.16.10
@@ -1764,8 +1764,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /notbundle/0.3.2:
-    resolution: {integrity: sha512-D+Z14qwcWwG/dMPl/k3fsb6zZ9ZyoFNhbhoIr5oCTySqdxpHqao+YTTBEn4RKFEqm3GsD86l1PnkXS21MyrgPw==}
+  /notbundle/0.3.3:
+    resolution: {integrity: sha512-5c7uzGXzWpRmGNwSCvCIdc7HAnP4XICNU0YFS3S4GiM41rMe0GaMhWdxn70jPx3QLwoJfN1BI50pnATB+IEKWA==}
     peerDependencies:
       '@swc/core': '*'
     peerDependenciesMeta:
