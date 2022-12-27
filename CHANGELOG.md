@@ -1,3 +1,7 @@
+## 0.6.4 (2022-12-27)
+
+- 7071a1c fix: bump notbundle to 0.3.3 #44
+
 ## 0.6.3 (2022-12-27)
 
 - 4d008ff fix: correct `transformOptions`
