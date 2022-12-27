@@ -74,7 +74,9 @@ export function polyfillConfig(config: Configuration): Configuration {
 }
 
 function esbuildPlugin(config: ResolvedConfig): Plugin {
-  config.transformOptions = {}
+  // Remove swc config
+  // @ts-ignore
+  delete config.transformOptions.env; delete config.transformOptions.module
   // Electron only support cjs.
   config.transformOptions.format ??= 'cjs'
   config.transformOptions.target ??= 'node14'
