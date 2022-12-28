@@ -1,5 +1,5 @@
-import path from 'path'
-import { rmSync } from 'fs'
+import path from 'node:path'
+import { rmSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import electron from 'vite-electron-plugin'
 import { loadViteEnv } from 'vite-electron-plugin/plugin'

@@ -23,7 +23,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "types": "rm -rf types && tsc -p tsconfig.build.json && tsc -p tsconfig.plugin.json",
+    "types": "rimraf types && tsc -p tsconfig.build.json && tsc -p tsconfig.plugin.json",
     "prepublishOnly": "npm run test && npm run build",
     "test": "vitest run"
   },
@@ -35,9 +35,10 @@
     "notbundle": "~0.3.3"
   },
   "devDependencies": {
-    "@types/node": "^18.11.17",
-    "esbuild": "^0.16.10",
-    "rollup": "^3.7.5",
+    "@types/node": "^18.11.18",
+    "esbuild": "^0.16.12",
+    "rimraf": "^3.0.2",
+    "rollup": "^3.9.0",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
     "vitest": "^0.26.2"

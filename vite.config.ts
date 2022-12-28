@@ -31,7 +31,7 @@ export default defineConfig({
         'vite',
         ...builtinModules,
         ...builtinModules.map(m => `node:${m}`),
-        ...Object.keys(pkg.dependencies),
+        ...Object.keys("dependencies" in pkg ? pkg.dependencies as {} : {}),
       ],
       output: {
         // Entry module "src/index.ts" is using named and default exports together.

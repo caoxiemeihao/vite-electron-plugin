@@ -13,7 +13,7 @@ High-performance, esbuild-based Vite Electron plugin
 ## Install
 
 ```sh
-npm i vite-electron-plugin -D
+npm i -D vite-electron-plugin
 ```
 
 ## Examples
@@ -194,7 +194,7 @@ Triggered when `transform()` ends or a file in `extensions` is removed.
 ## Builtin Plugin
 
 ```ts
-import path from 'path'
+import path from 'node:path'
 import electron from 'vite-electron-plugin'
 import {
   alias,

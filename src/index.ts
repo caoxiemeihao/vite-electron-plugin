@@ -1,4 +1,4 @@
-import type { AddressInfo } from 'net'
+import type { AddressInfo } from 'node:net'
 import type {
   ResolvedConfig as ViteResolvedConfig,
   Plugin as VitePlugin,
@@ -13,8 +13,8 @@ import {
 } from './config'
 
 import {
-  build as build2,
-  watch as watch2,
+  build as notbundleBuild,
+  watch as notbundleWatch,
 } from 'notbundle'
 
 // public export
@@ -34,13 +34,11 @@ function defineConfig(config: Configuration) {
 }
 
 function build(config: Configuration) {
-  // @ts-ignore
-  return build2(polyfillConfig(config))
+  return notbundleBuild(polyfillConfig(config) as any)
 }
 
 function watch(config: Configuration) {
-  // @ts-ignore
-  return watch2(polyfillConfig(config))
+  return notbundleWatch(polyfillConfig(config) as any)
 }
 
 function electron(config: Configuration): VitePlugin[] {
@@ -152,7 +150,7 @@ function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
  * @param argv default value `['.', '--no-sandbox']`
  */
 async function startup(argv = ['.', '--no-sandbox']) {
-  const { spawn } = await import('child_process')
+  const { spawn } = await import('node:child_process')
   // @ts-ignore
   const electron = await import('electron')
   const electronPath = <any>(electron.default ?? electron)

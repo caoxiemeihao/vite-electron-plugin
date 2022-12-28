@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from 'electron'
-import path from 'path'
+import path from 'node:path'
 
 // The built directory structure
 //
