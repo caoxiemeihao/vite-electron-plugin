@@ -21,6 +21,7 @@ npm i -D vite-electron-plugin
 - [quick-start](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/quick-start)
 - [plugin/alias](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/alias)
 - [plugin/copy](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/copy)
+- [plugin/esmodule](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/esmodule)
 - [plugin/custom-start-electron-app](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/custom-start-electron-app)
 
 ## Recommend structure
@@ -199,6 +200,7 @@ import electron from 'vite-electron-plugin'
 import {
   alias,
   copy,
+  esmodule,
   customStart,
   loadViteEnv,
 } from 'vite-electron-plugin/plugin'
@@ -221,6 +223,12 @@ export default {
         customStart(({ startup }) => {
           // If you want to control the launch of Electron App yourself.
           startup()
+        }),
+
+        // Support use ESM npm-package in Electron-Main.  
+        esmodule({
+          // e.g. `execa`, `node-fetch`, `got`, etc.
+          include: ['execa', 'node-fetch', 'got'],
         }),
 
         // https://vitejs.dev/guide/env-and-mode.html#env-files

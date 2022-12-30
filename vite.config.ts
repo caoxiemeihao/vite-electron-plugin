@@ -16,7 +16,7 @@ export default defineConfig({
     outDir: '',
     lib: {
       entry: {
-        plugin: 'plugin/index.ts',
+        plugin: 'src-plugin/index.ts',
         src: 'src/index.ts',
       },
       formats: ['cjs', 'es'],

@@ -1,0 +1,22 @@
+{
+  "name": "vite-electron-plugin-custom-start-electron-app",
+  "version": "0.0.0",
+  "private": true,
+  "author": "草鞋没号 <308487730@qq.com>",
+  "license": "MIT",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && electron-builder"
+  },
+  "dependencies": {
+    "execa": "^6.1.0"
+  },
+  "devDependencies": {
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3",
+    "vite-electron-plugin": "workspace:*"
+  }
+}

@@ -113,6 +113,4 @@ yarn.lock
 /index.js
 /index.mjs
 /types
-/plugin/index.js
-/plugin/index.mjs
-/plugin/index.d.ts
+/plugin
