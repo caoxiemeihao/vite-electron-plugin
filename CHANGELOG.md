@@ -1,3 +1,19 @@
+## 0.7.0 (2022-12-30)
+
+#### Features
+
+Support use ESM npm-package in Electron-Main.
+
+```ts
+import { esmodule } from 'vite-electron-plugin/plugin'
+```
+
+👉 [example](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/esmodule)
+
+- 1879a2e feat: examples/esmodule
+- c47bc38 feat: support ESM npm-package | electron-vite-react#98
+- 8441b06 refactor: cleanup plugin -> src-plugin
+
 ## 0.6.4 (2022-12-27)
 
 - 7071a1c fix: bump notbundle to 0.3.3 #44
