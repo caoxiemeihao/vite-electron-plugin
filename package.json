@@ -1,6 +1,6 @@
 {
   "name": "vite-electron-plugin",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "High-performance, esbuild-based Vite Electron plugin",
   "main": "index.js",
   "types": "types",
@@ -43,9 +43,7 @@
     "vitest": "^0.26.2"
   },
   "files": [
-    "plugin/index.js",
-    "plugin/index.mjs",
-    "plugin/index.d.ts",
+    "plugin",
     "electron-env.d.ts",
     "types",
     "index.mjs",
