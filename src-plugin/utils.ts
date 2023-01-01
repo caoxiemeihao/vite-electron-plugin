@@ -7,20 +7,6 @@ export function ensureDir(filename: string): string {
   return filename
 }
 
-/**
- * - `'' -> '.'`
- * - `foo` -> `./foo`
- */
-export function relativeify(relative: string) {
-  if (relative === '') {
-    return '.'
-  }
-  if (!relative.startsWith('.')) {
-    return './' + relative
-  }
-  return relative
-}
-
 export function node_modules(root: string, count = 0): string {
   if (node_modules.p) {
     return node_modules.p
@@ -36,10 +22,3 @@ export function node_modules(root: string, count = 0): string {
 }
 // For ts-check
 node_modules.p = ''
-
-function slash(p: string): string {
-  return p.replace(/\\/g, '/')
-}
-export function normalizePath(id: string): string {
-  return path.posix.normalize(process.platform === 'win32' ? slash(id) : id)
-}
