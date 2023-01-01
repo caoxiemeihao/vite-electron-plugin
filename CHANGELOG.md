@@ -1,3 +1,10 @@
+## 0.7.2 (2023-01-01)
+
+- f80b98a chore: update examples/esmodule
+- 201547c feat(plugin/alias): support dynamic `import()`
+- b1a33c6 chore: cleanup, use `vite-plugin-utils`
+- a78371b chore(deps): add `acorn`, `vite-plugin-utils`
+
 ## 0.7.1 (2022-12-30)
 
 - ed4993c fix: include types
