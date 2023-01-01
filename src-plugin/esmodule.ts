@@ -2,14 +2,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createRequire, builtinModules } from 'node:module'
 import esbuild from 'esbuild'
-import { colours } from 'notbundle'
+import { COLOURS, normalizePath } from 'vite-plugin-utils/function'
 import type { Plugin } from '..'
 import { alias } from './alias'
-import {
-  ensureDir,
-  node_modules,
-  normalizePath,
-} from './utils'
+import { ensureDir, node_modules } from './utils'
 
 const CACHE_DIR = '.esmodule'
 
@@ -46,11 +42,11 @@ export function esmodule(options: ESModuleOptions): Plugin {
       const aliasOptions: Parameters<typeof alias>[0] = []
 
       await Promise.all(include.map(name => {
-        aliasOptions.push({ find: new RegExp(`^${name}$`), replacement: [cacheDir, name].join('/') })
+        aliasOptions.push({ find: new RegExp(`^${name}$`), replacement: [cacheDir!, name].join('/') })
         return esmBundling({
           name,
           root,
-          cacheDir,
+          cacheDir: cacheDir!,
           buildOptions,
         })
       }))
@@ -84,7 +80,7 @@ async function esmBundling(args: {
   try {
     entry = cjs_require.resolve(pkgPath)
   } catch (error: any) {
-    console.log(colours.red(error))
+    console.log(COLOURS.red(error))
     return
   }
 
@@ -106,7 +102,7 @@ async function esmBundling(args: {
   })
 
   if (!result.errors.length) {
-    console.log(colours.green('[plugin/esmodule]'), path.posix.relative(root, outfile))
+    console.log(COLOURS.green('[plugin/esmodule]'), path.posix.relative(root, outfile))
   }
 
   return result

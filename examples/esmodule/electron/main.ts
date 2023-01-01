@@ -14,11 +14,18 @@ app.whenReady().then(() => {
   })
 
   win.webContents.on('did-finish-load', async () => {
-    const { stdout } = await execa('echo', ['unicorns']);
-    console.log(stdout);
+    const { stdout } = await execa('echo', ['unicorns'])
+    console.log(stdout)
 
     // Test actively push message to the Electron-Renderer
     win?.webContents.send('main-process-message', `execa.echo -> ${stdout}`)
+
+    await import('execa').then(async ({ execa }) => {
+      const { stdout } = await execa('echo', ["async import('execa')"])
+      console.log(stdout)
+
+      win?.webContents.send('main-process-message', `execa.echo -> ${stdout}`)
+    })
   })
   win.webContents.openDevTools()
 

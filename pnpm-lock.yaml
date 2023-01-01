@@ -5,18 +5,22 @@ importers:
   .:
     specifiers:
       '@types/node': ^18.11.18
+      acorn: ^8.8.1
       esbuild: ^0.16.12
       fast-glob: ^3.2.12
       notbundle: ~0.3.3
       rollup: ^3.9.0
       typescript: ^4.9.4
       vite: ^4.0.3
+      vite-plugin-utils: ~0.3.6
       vitest: ^0.26.2
     dependencies:
       fast-glob: 3.2.12
       notbundle: 0.3.3
+      vite-plugin-utils: 0.3.6
     devDependencies:
       '@types/node': 18.11.18
+      acorn: 8.8.1
       esbuild: 0.16.12
       rollup: 3.9.0
       typescript: 4.9.4
@@ -2558,6 +2562,10 @@ packages:
       - supports-color
       - terser
     dev: true
+
+  /vite-plugin-utils/0.3.6:
+    resolution: {integrity: sha512-+tZdnTxrDdjPzrlPUyvm52SvOVRibDEnA9NdzQt85UoqXwLGJp4RAkT9fK11KdLMTdJlb9DxCvHrDfsn/lSKug==}
+    dev: false
 
   /vite/4.0.3:
     resolution: {integrity: sha512-HvuNv1RdE7deIfQb8mPk51UKjqptO/4RXZ5yXSAvurd5xOckwS/gg8h9Tky3uSbnjYTgUm0hVCet1cyhKd73ZA==}

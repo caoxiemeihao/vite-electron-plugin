@@ -1,5 +1,5 @@
 import { loadEnv } from 'vite'
-import type { Plugin, ResolvedConfig } from '..'
+import type { Plugin } from '..'
 
 export function loadViteEnv(): Plugin {
   return {

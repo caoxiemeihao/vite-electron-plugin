@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { colours, normalizePath } from 'notbundle'
+import { COLOURS, normalizePath } from 'vite-plugin-utils/function'
 import type { Plugin } from '..'
 import { ensureDir } from './utils'
 
@@ -11,7 +11,7 @@ export function copy(options: {
   const copyStream = (filename: string, destname: string) => fs
     .createReadStream(filename)
     .pipe(fs.createWriteStream(destname))
-    .on('error', error => console.log(colours.red(error.message)))
+    .on('error', error => console.log(COLOURS.red(error.message)))
 
   return {
     name: 'plugin-copy',
@@ -42,7 +42,7 @@ export function copy(options: {
 
               ensureDir(destname)
               copyStream(filename, destname).on('finish', () =>
-                console.log(colours.green('[plugin/copy]'), destname.replace(config.root + '/', '')),
+                console.log(COLOURS.green('[plugin/copy]'), destname.replace(config.root + '/', '')),
               )
             }
           })
