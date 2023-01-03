@@ -30,6 +30,7 @@ export default defineConfig({
         'esbuild',
         'vite',
         'acorn',
+        'little-byte',
         ...builtinModules,
         ...builtinModules.map(m => `node:${m}`),
         ...Object.keys("dependencies" in pkg ? pkg.dependencies as {} : {}),
