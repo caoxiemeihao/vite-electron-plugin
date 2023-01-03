@@ -1,4 +1,5 @@
 export { alias } from './alias'
+export { bytecode } from './bytecode'
 export { copy } from './copy'
 export { customStart } from './custom-start'
 export { esmodule } from './esmodule'
