@@ -1,3 +1,7 @@
+## 0.7.3 (2023-01-06)
+
+- 5a4c8db fix: acorn.parse use `ecmaVersion: 2022`
+
 ## 0.7.2 (2023-01-01)
 
 - f80b98a chore: update examples/esmodule
