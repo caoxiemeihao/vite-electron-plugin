@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "fast-glob": "^3.2.12",
-    "notbundle": "~0.3.3"
+    "notbundle": "~0.3.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
