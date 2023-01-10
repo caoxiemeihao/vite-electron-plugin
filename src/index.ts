@@ -5,6 +5,7 @@ import type {
   ViteDevServer,
   UserConfig,
 } from 'vite'
+import { startup } from 'vite-plugin-electron'
 import {
   type Configuration,
   type ResolvedConfig,
@@ -142,34 +143,4 @@ function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
     clearTimeout(t)
     t = setTimeout(() => fn(...args), delay)
   })
-}
-
-/**
- * Electron App startup function.  
- * It will mount the Electron App child-process to `process.electronApp`.  
- * @param argv default value `['.', '--no-sandbox']`
- */
-async function startup(argv = ['.', '--no-sandbox']) {
-  const { spawn } = await import('node:child_process')
-  // @ts-ignore
-  const electron = await import('electron')
-  const electronPath = <any>(electron.default ?? electron)
-
-  startup.exit()
-  // Start Electron.app
-  process.electronApp = spawn(electronPath, argv, { stdio: 'inherit' })
-  // Exit command after Electron.app exits
-  process.electronApp.once('exit', process.exit)
-
-  if (!startup.hookProcessExit) {
-    startup.hookProcessExit = true
-    process.once('exit', startup.exit)
-  }
-}
-startup.hookProcessExit = false
-startup.exit = () => {
-  if (process.electronApp) {
-    process.electronApp.removeAllListeners()
-    process.electronApp.kill()
-  }
 }
