@@ -12,6 +12,7 @@ importers:
       rollup: ^3.9.0
       typescript: ^4.9.4
       vite: ^4.0.3
+      vite-plugin-electron: ^0.11.1
       vite-plugin-utils: ^0.3.6
       vitest: ^0.26.2
     dependencies:
@@ -24,6 +25,7 @@ importers:
       rollup: 3.9.0
       typescript: 4.9.4
       vite: 4.0.3_@types+node@18.11.18
+      vite-plugin-electron: 0.11.1
       vite-plugin-utils: 0.3.6
       vitest: 0.26.2
 
@@ -2565,6 +2567,10 @@ packages:
       - sugarss
       - supports-color
       - terser
+    dev: true
+
+  /vite-plugin-electron/0.11.1:
+    resolution: {integrity: sha512-pi9Wy4KCGjKIRvp7/5VUOT8BYEAJdZrpy3gI+GhGc5vYs2V9yPxLOtfCqNfSTYqH3uM6hYY6MyifFVku3Wg+2A==}
     dev: true
 
   /vite-plugin-utils/0.3.6:
