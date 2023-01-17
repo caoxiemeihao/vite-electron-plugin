@@ -23,7 +23,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "types": "rm -rf types && tsc -p tsconfig.build.json && tsc -p tsconfig.plugin.json",
+    "types": "tsc -p tsconfig.build.json && tsc -p tsconfig.plugin.json",
     "prepublishOnly": "npm run test && npm run build",
     "test": "vitest run"
   },

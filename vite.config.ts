@@ -1,19 +1,15 @@
-import { spawn } from 'child_process'
+import fs from 'node:fs'
+import { spawn } from 'node:child_process'
 import { builtinModules } from 'module'
 import { defineConfig } from 'vite'
 import pkg from './package.json'
 
 export default defineConfig({
-  plugins: [{
-    name: 'build-plugin',
-    configResolved() {
-      generateTypes()
-    },
-  }],
   build: {
-    minify: false,
     emptyOutDir: false,
+    minify: false,
     outDir: '',
+    target: 'node14',
     lib: {
       entry: {
         plugin: 'src-plugin/index.ts',
@@ -32,7 +28,7 @@ export default defineConfig({
         'acorn',
         ...builtinModules,
         ...builtinModules.map(m => `node:${m}`),
-        ...Object.keys("dependencies" in pkg ? pkg.dependencies as {} : {}),
+        ...Object.keys('dependencies' in pkg ? pkg.dependencies as {} : {}),
       ],
       output: {
         // Entry module "src/index.ts" is using named and default exports together.
@@ -41,7 +37,6 @@ export default defineConfig({
         exports: 'named',
       },
     },
-    target: 'node14',
   },
 })
 
@@ -58,4 +53,10 @@ function generateTypes() {
     })
     cp.on('error', process.exit)
   })
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  fs.rmSync('plugin', { recursive: true, force: true })
+  fs.rmSync('types', { recursive: true, force: true })
+  generateTypes()
 }
