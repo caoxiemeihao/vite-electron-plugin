@@ -3,7 +3,6 @@ import type {
   ResolvedConfig as ViteResolvedConfig,
   Plugin as VitePlugin,
   ViteDevServer,
-  UserConfig,
 } from 'vite'
 import { startup } from 'vite-plugin-electron'
 import {
@@ -43,13 +42,11 @@ function watch(config: Configuration) {
 }
 
 function electron(config: Configuration): VitePlugin[] {
-  let userConfig: UserConfig
   let resolvedConfig: ViteResolvedConfig
   let viteDevServer: ViteDevServer
   const getConfig = (_config = config) => {
     _config.api ??= {}
     _config.api.vite ??= {}
-    _config.api.vite.config ??= userConfig
     _config.api.vite.resolvedConfig ??= resolvedConfig
     _config.api.vite.server ??= viteDevServer
     return _config
@@ -58,7 +55,6 @@ function electron(config: Configuration): VitePlugin[] {
     config(_config) {
       // Make sure that Electron App can be loaded into the local file using `loadFile` after build
       _config.base ??= './'
-      userConfig = _config
     },
     configResolved(_config) {
       resolvedConfig = _config

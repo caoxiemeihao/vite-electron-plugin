@@ -1,5 +1,5 @@
 import path from 'node:path'
-import type { ViteDevServer, ResolvedConfig as ViteResolvedConfig, UserConfig } from 'vite'
+import type { ViteDevServer, ResolvedConfig as ViteResolvedConfig } from 'vite'
 import {
   type Configuration as Configuration2,
   type ResolvedConfig as ResolvedConfig2,
@@ -11,8 +11,8 @@ export interface Configuration extends Omit<Configuration2, 'output' | 'plugins'
   /** @default 'dist-electron' */
   outDir?: string
   api?: {
+    // `vite` only passes some readonly members, because the `notbundle` plugin-system runs with Vite already fully loaded.
     vite?: {
-      config?: UserConfig
       resolvedConfig?: ViteResolvedConfig
       server?: ViteDevServer
     }
