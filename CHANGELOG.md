@@ -1,3 +1,9 @@
+## 0.7.4 (2023-01-19)
+
+- 1390a35 refactor: remove `Configuration.api.vite.config`
+- 89bdbdd refactor: use `startup()` from vite-plugin-electron
+- 1f73941 chore: compatible `acorn7.x`
+
 ## 0.7.3 (2023-01-06)
 
 - 5a4c8db fix: acorn.parse use `ecmaVersion: 2022`
