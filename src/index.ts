@@ -3,8 +3,8 @@ import type {
   ResolvedConfig as ViteResolvedConfig,
   Plugin as VitePlugin,
   ViteDevServer,
-  UserConfig,
 } from 'vite'
+import { startup } from 'vite-plugin-electron'
 import {
   type Configuration,
   type ResolvedConfig,
@@ -42,13 +42,11 @@ function watch(config: Configuration) {
 }
 
 function electron(config: Configuration): VitePlugin[] {
-  let userConfig: UserConfig
   let resolvedConfig: ViteResolvedConfig
   let viteDevServer: ViteDevServer
   const getConfig = (_config = config) => {
     _config.api ??= {}
     _config.api.vite ??= {}
-    _config.api.vite.config ??= userConfig
     _config.api.vite.resolvedConfig ??= resolvedConfig
     _config.api.vite.server ??= viteDevServer
     return _config
@@ -57,7 +55,6 @@ function electron(config: Configuration): VitePlugin[] {
     config(_config) {
       // Make sure that Electron App can be loaded into the local file using `loadFile` after build
       _config.base ??= './'
-      userConfig = _config
     },
     configResolved(_config) {
       resolvedConfig = _config
@@ -142,34 +139,4 @@ function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {
     clearTimeout(t)
     t = setTimeout(() => fn(...args), delay)
   })
-}
-
-/**
- * Electron App startup function.  
- * It will mount the Electron App child-process to `process.electronApp`.  
- * @param argv default value `['.', '--no-sandbox']`
- */
-async function startup(argv = ['.', '--no-sandbox']) {
-  const { spawn } = await import('node:child_process')
-  // @ts-ignore
-  const electron = await import('electron')
-  const electronPath = <any>(electron.default ?? electron)
-
-  startup.exit()
-  // Start Electron.app
-  process.electronApp = spawn(electronPath, argv, { stdio: 'inherit' })
-  // Exit command after Electron.app exits
-  process.electronApp.once('exit', process.exit)
-
-  if (!startup.hookProcessExit) {
-    startup.hookProcessExit = true
-    process.once('exit', startup.exit)
-  }
-}
-startup.hookProcessExit = false
-startup.exit = () => {
-  if (process.electronApp) {
-    process.electronApp.removeAllListeners()
-    process.electronApp.kill()
-  }
 }

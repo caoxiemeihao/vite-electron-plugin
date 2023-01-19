@@ -2,8 +2,8 @@
 
 High-performance, esbuild-based Vite Electron plugin
 
-[![NPM version](https://img.shields.io/npm/v/vite-electron-plugin.svg)](https://npmjs.org/package/vite-electron-plugin)
-[![NPM Downloads](https://img.shields.io/npm/dm/vite-electron-plugin.svg)](https://npmjs.org/package/vite-electron-plugin)
+[![NPM version](https://img.shields.io/npm/v/vite-electron-plugin.svg)](https://npmjs.com/package/vite-electron-plugin)
+[![NPM Downloads](https://img.shields.io/npm/dm/vite-electron-plugin.svg)](https://npmjs.com/package/vite-electron-plugin)
 
 - 🚀 High-performance <sub><sup>(Not Bundle, based on esbuild)</sup></sub>
 - 🎯 Support Plugin <sub><sup>(Like Vite's plugin)</sup></sub>

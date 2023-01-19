@@ -8,15 +8,16 @@ importers:
       acorn: ^8.8.1
       esbuild: ^0.16.12
       fast-glob: ^3.2.12
-      notbundle: ~0.3.3
+      notbundle: ~0.3.4
       rollup: ^3.9.0
       typescript: ^4.9.4
       vite: ^4.0.3
+      vite-plugin-electron: ^0.11.1
       vite-plugin-utils: ^0.3.6
       vitest: ^0.26.2
     dependencies:
       fast-glob: 3.2.12
-      notbundle: 0.3.3
+      notbundle: 0.3.4
     devDependencies:
       '@types/node': 18.11.18
       acorn: 8.8.1
@@ -24,6 +25,7 @@ importers:
       rollup: 3.9.0
       typescript: 4.9.4
       vite: 4.0.3_@types+node@18.11.18
+      vite-plugin-electron: 0.11.1
       vite-plugin-utils: 0.3.6
       vitest: 0.26.2
 
@@ -2045,8 +2047,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /notbundle/0.3.3:
-    resolution: {integrity: sha512-5c7uzGXzWpRmGNwSCvCIdc7HAnP4XICNU0YFS3S4GiM41rMe0GaMhWdxn70jPx3QLwoJfN1BI50pnATB+IEKWA==}
+  /notbundle/0.3.4:
+    resolution: {integrity: sha512-SUdxFCJIW9jCdPwef5EFRW3nIonZ2rGcsvE/qz+xFA/7j9jUdBYN4gjbWgQS1RajaOj4fu1vQcVAKRKv48WAhg==}
     peerDependencies:
       '@swc/core': '*'
     peerDependenciesMeta:
@@ -2565,6 +2567,10 @@ packages:
       - sugarss
       - supports-color
       - terser
+    dev: true
+
+  /vite-plugin-electron/0.11.1:
+    resolution: {integrity: sha512-pi9Wy4KCGjKIRvp7/5VUOT8BYEAJdZrpy3gI+GhGc5vYs2V9yPxLOtfCqNfSTYqH3uM6hYY6MyifFVku3Wg+2A==}
     dev: true
 
   /vite-plugin-utils/0.3.6:

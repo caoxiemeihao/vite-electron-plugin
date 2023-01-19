@@ -34,10 +34,7 @@ export function alias(options: {
         throw new Error('[plugin/alias] dependency "acorn". Did you install it?')
       }
 
-      const ast = acorn.parse(code, {
-        // https://github.com/electron-vite/electron-vite-react/issues/98#issuecomment-1372810726
-        ecmaVersion: 2022,
-      })
+      const ast = acorn.parse(code, { ecmaVersion: 2020 }) // acorn7.x Last supported 2020
       const ms = new MagicString(code)
       const nodes: AliasNode[] = []
 
