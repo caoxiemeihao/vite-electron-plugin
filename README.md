@@ -200,6 +200,7 @@ import electron from 'vite-electron-plugin'
 import {
   alias,
   copy,
+  dest,
   esmodule,
   customStart,
   loadViteEnv,
@@ -219,6 +220,9 @@ export default {
           // filename, glob
           { from: 'foo/*.ext', to: 'dest' },
         ]),
+
+        // Dynamic change the build dist path.
+        dest((_from, to) => to?.replace('dist-electron', 'dist-other')),
 
         customStart(({ startup }) => {
           // If you want to control the launch of Electron App yourself.
