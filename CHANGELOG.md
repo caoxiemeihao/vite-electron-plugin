@@ -1,3 +1,8 @@
+## 0.8.0 (2023-02-18)
+
+- cf76b6d feat(plugin/esmodule): reuse cache
+- 3bf1a29 feat(plugin): add dest
+
 ## 0.7.4 (2023-01-19)
 
 - 1390a35 refactor: remove `Configuration.api.vite.config`

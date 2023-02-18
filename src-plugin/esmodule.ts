@@ -37,12 +37,19 @@ export function esmodule(options: ESModuleOptions): Plugin {
 
       cacheDir = normalizePath(path.resolve(root, cacheDir ?? CACHE_DIR))
       // TODO: cache check
-      fs.rmSync(cacheDir, { recursive: true, force: true })
+      // fs.rmSync(cacheDir, { recursive: true, force: true })
 
       const aliasOptions: Parameters<typeof alias>[0] = []
 
       await Promise.all(include.map(name => {
         aliasOptions.push({ find: new RegExp(`^${name}$`), replacement: [cacheDir!, name].join('/') })
+
+        const outfile = path.join(cacheDir!, name + '.js')
+        if (fs.existsSync(outfile)) {
+          // Reuse cache
+          // TODO: Check reusable 
+          return
+        }
         return esmBundling({
           name,
           root,

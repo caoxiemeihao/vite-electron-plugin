@@ -1,6 +1,6 @@
 {
   "name": "vite-electron-plugin",
-  "version": "0.7.4",
+  "version": "0.8.0",
   "description": "High-performance, esbuild-based Vite Electron plugin",
   "main": "index.js",
   "types": "types",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "fast-glob": "^3.2.12",
-    "notbundle": "~0.3.4",
+    "notbundle": "~0.4.0",
     "vite-plugin-electron": "~0.11.1"
   },
   "devDependencies": {
