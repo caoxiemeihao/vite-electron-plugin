@@ -1,3 +1,7 @@
+## 0.8.1 (2023-02-21)
+
+- e67fcd0 fix: safe custom start
+
 ## 0.8.0 (2023-02-18)
 
 - cf76b6d feat(plugin/esmodule): reuse cache
