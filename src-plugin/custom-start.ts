@@ -13,8 +13,11 @@ export function customStart(callback?: (args?: {
     name: 'plugin-custom-start',
     configResolved(_config) {
       config = _config
-      // Remove internal startup function
-      config.plugins.splice(_config.plugins.findIndex(plugin => plugin.name === ':startup'), 1)
+      const index = _config.plugins.findIndex(plugin => plugin.name === ':startup')
+      if (index > -1) {
+        // Remove internal startup plugin
+        config.plugins.splice(index, 1)
+      }
     },
     ondone({ filename }) {
       const { api: { vite }, experimental } = config
