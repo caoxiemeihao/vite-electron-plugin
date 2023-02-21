@@ -10,21 +10,60 @@ High-performance, esbuild-based Vite Electron plugin
 - 🌱 What you see is what you get
 - 🔥 Hot restart
 
-## Install
+## Quick Setup
+
+1. Add dependency to project
 
 ```sh
 npm i -D vite-electron-plugin
 ```
 
-## Examples
+2. Add `vite-electron-plugin` into `vite.config.ts`
+
+```js
+import electron from 'vite-electron-plugin'
+
+export default {
+  plugins: [
+    electron({
+      include: [
+        // The Electron source codes directory
+        'electron',
+      ],
+    }),
+  ],
+}
+```
+
+3. Create `electron/main.ts` and type the following code
+
+```js
+import { app, BrowserWindow } from 'electron'
+
+app.whenReady().then(() => {
+  const win = new BrowserWindow()
+
+  if (process.env.VITE_DEV_SERVER_URL) {
+    win.loadURL(process.env.VITE_DEV_SERVER_URL)
+  } else {
+    win.loadFile('dist/index.html')
+  }
+})
+```
+
+4. Add entry into `package.json`
+
+```diff
+{
++ "main": "dist-electron/main.js"
+}
+```
+
+## [Examples](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples)
 
 - [quick-start](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/quick-start)
-- [plugin/alias](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/alias)
-- [plugin/copy](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/copy)
-- [plugin/esmodule](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/esmodule)
-- [plugin/custom-start-electron-app](https://github.com/electron-vite/vite-electron-plugin/tree/main/examples/custom-start-electron-app)
 
-## Recommend structure
+## Recommend Structure
 
 Let's use the official [template-vanilla-ts](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-vanilla-ts) created based on `create vite` as an example
 
@@ -47,41 +86,6 @@ Let's use the official [template-vanilla-ts](https://github.com/vitejs/vite/tree
 - Any file ending with `reload.ext` *(e.g. `foo.reload.js`, `preload.ts`)* after an update,  
   will trigger a reload of the Electron-Renderer process, instead of an entire Electron App restart.  
   **Which is useful when updating Preload-Scripts.**
-
-## Usage
-
-vite.config.ts
-
-```js
-import electron from 'vite-electron-plugin'
-
-export default {
-  plugins: [
-    electron({
-      include: [
-        // The Electron source codes directory
-        'electron',
-      ],
-    }),
-  ],
-}
-```
-
-electron/main.ts
-
-```js
-import { app, BrowserWindow } from 'electron'
-
-app.whenReady().then(() => {
-  const win = new BrowserWindow()
-
-  if (app.isPackaged) {
-    win.loadFile('your-build-output-index.html')
-  } else {
-    win.loadURL(process.env.VITE_DEV_SERVER_URL)
-  }
-})
-```
 
 ## Configuration
 
