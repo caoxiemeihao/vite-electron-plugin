@@ -1,3 +1,7 @@
+## 0.8.2 (2023-02-22)
+
+- f6cd34d feat: customStart with debounce
+
 ## 0.8.1 (2023-02-21)
 
 - e67fcd0 fix: safe custom start
