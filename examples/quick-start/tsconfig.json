@@ -6,6 +6,7 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "allowJs": true,
+    "jsx": "react-jsx",
     "declaration": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
