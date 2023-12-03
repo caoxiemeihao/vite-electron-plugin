@@ -12,10 +12,14 @@ export default defineConfig({
       'electron',
     ],
     plugins: [
-      alias([{
-        find: '@common',
-        replacement: path.join(__dirname, 'common'),
-      }]),
+      alias(
+        [
+          { find: '@common', replacement: path.join(__dirname, 'common') },
+        ],
+        {
+          acornOptions: { ecmaVersion: 2022 },
+        },
+      ),
     ],
   })],
 })

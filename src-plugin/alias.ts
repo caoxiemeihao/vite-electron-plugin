@@ -18,10 +18,15 @@ export interface AliasNode {
   }
 }
 
-export function alias(options: {
-  find: string | RegExp
-  replacement: string
-}[]): Plugin {
+export function alias(
+  aliases: {
+    find: string | RegExp
+    replacement: string
+  }[],
+  options?: {
+    acornOptions?: Partial<import('acorn').Options>
+  },
+): Plugin {
   let acorn: typeof import('acorn')
   return {
     name: 'plugin-alias',
@@ -34,7 +39,13 @@ export function alias(options: {
         throw new Error('[plugin/alias] dependency "acorn". Did you install it?')
       }
 
-      const ast = acorn.parse(code, { ecmaVersion: 2020 }) // acorn7.x Last supported 2020
+      const ast = acorn.parse(
+        code,
+        Object.assign({
+          // acorn7.x Last supported 2020
+          ecmaVersion: 2020
+        }, options?.acornOptions),
+      )
       const ms = new MagicString(code)
       const nodes: AliasNode[] = []
 
@@ -82,7 +93,7 @@ export function alias(options: {
         } = node
 
         const source = importee.raw.slice(1, -1)
-        const option = options.find(opt => opt.find instanceof RegExp
+        const option = aliases.find(opt => opt.find instanceof RegExp
           ? opt.find.test(source)
           : source.startsWith(opt.find + '/'))
         if (!option) continue
