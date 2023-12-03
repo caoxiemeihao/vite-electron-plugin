@@ -1,3 +1,9 @@
+## 0.8.3 (2023-12-03)
+
+- 0a33562 feat(plugin/alias): add `acornOptions` for #59
+- a45237c chore: bump vite-plugin-electron to 0.14.1
+- 30acf9c chore(deps): optional esbuild
+
 ## 0.8.2 (2023-02-22)
 
 - f6cd34d feat: customStart with debounce
