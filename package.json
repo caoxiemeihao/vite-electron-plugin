@@ -42,7 +42,7 @@
   "dependencies": {
     "fast-glob": "^3.2.12",
     "notbundle": "~0.4.0",
-    "vite-plugin-electron": "~0.11.1"
+    "vite-plugin-electron": "~0.14.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
